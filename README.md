@@ -10,6 +10,7 @@ SyntaxLab is a small, static learning workspace where you read a concept, edit e
 
 - 15 short TOML lessons, from key/value pairs to `pyproject.toml`
 - 7 introductory Computer Level 2 lessons covering public foundations, Word, Excel, PowerPoint, Python, and review habits
+- A standalone 6-lesson Python Level 2 path, starting with installation, PATH verification, and the first runnable `.py` file
 - Real TOML parsing and semantic exercise checks
 - Complete, repair, and write-from-requirement exercises
 - Progressive hints after failed attempts
@@ -22,6 +23,7 @@ SyntaxLab is a small, static learning workspace where you read a concept, edit e
 
 - [x] TOML fundamentals
 - [x] Computer Level 2 introduction
+- [x] Python Level 2 path from environment setup to exam review
 - [x] Interactive exercises
 - [x] TOML validation
 - [x] Local progress

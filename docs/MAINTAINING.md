@@ -22,6 +22,7 @@ src/
 ├── core/                    # 共享类型、校验和状态逻辑
 ├── languages/toml/          # TOML 课程、练习和中文内容
 ├── languages/computer/      # 计算机二级入门课程、练习和中文内容
+├── languages/python/        # Python 二级专项课程和练习
 ├── App.tsx                  # 工作区布局和状态组合
 └── styles.css               # 全局视觉和响应式样式
 .github/workflows/deploy.yml # GitHub Pages 自动部署
