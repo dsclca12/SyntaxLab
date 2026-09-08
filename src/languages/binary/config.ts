@@ -31,7 +31,10 @@ export const createBinaryExercises = (lessonId: string, seed: number): Exercise[
     const bits = randomInt(salt, 2, 6)
     const bytes = randomInt(salt + 1, 2, 8)
     return [
-      answer(`binary-${lessonId}-${seed}-states`, 'create', '状态数量', `${bits} 个 bit 一共有多少种不同状态？写出计算式和结果。`, `${bits} 个 bit：`, `2^${bits} = ${2 ** bits}`, [`每个 bit 有 2 种状态。`, `把 2 连乘 ${bits} 次。`, `状态数量是 ${2 ** bits}。`], (source) => compact(source).includes(`2^${bits}`) && compact(source).includes(String(2 ** bits)), 'n 个 bit 的组合数是 2ⁿ，不是 n×2。'),
+      answer(`binary-${lessonId}-${seed}-states`, 'create', '状态数量', `${bits} 个 bit 一共有多少种不同状态？写出计算式和结果。`, `计算式：2^${bits} = `, `2^${bits} = ${2 ** bits}`, [`每个 bit 有 2 种状态。`, `把 2 连乘 ${bits} 次。`, `状态数量是 ${2 ** bits}。`], (source) => {
+        const normalized = compact(source).replace(/[＝]/g, '=').replace(/\*\*/g, '^').replace(/⁰/g, '0').replace(/¹/g, '1').replace(/²/g, '2').replace(/³/g, '3').replace(/⁴/g, '4').replace(/⁵/g, '5').replace(/⁶/g, '6')
+        return new RegExp(`2\\s*\\^\\s*${bits}\\s*=\\s*${2 ** bits}`).test(normalized) || (normalized.includes(`2^${bits}`) && normalized.includes(String(2 ** bits)))
+      }, 'n 个 bit 的组合数是 2ⁿ，不是 n×2。'),
       answer(`binary-${lessonId}-${seed}-byte`, 'create', '单位换算', `${bytes} Byte 等于多少 bit？`, `${bytes} Byte = `, `${bytes * 8} bit`, ['现代计算机中 1 Byte 通常由 8 bit 组成。', `计算 ${bytes} × 8。`, '答案要带 bit 单位。'], (source) => numberAnswer(bytes * 8, source) && /bit|位/i.test(source), 'Byte 是数据组织单位，bit 是单个二进制位。'),
       answer(`binary-${lessonId}-${seed}-why`, 'create', '解释二进制', '用一句话说明电子计算机为什么适合使用二进制。', '', '两种离散状态更容易用晶体管可靠地区分，并且对噪声更有容错空间。', ['至少提到“两种状态”。', '再联系噪声或稳定性。', '可以提到晶体管或物理信号。'], (source) => /(两种|二元|0和1|0、1)/.test(source) && /(噪声|稳定|可靠|晶体管|电路)/.test(source), '原因是物理实现更可靠，而不是计算机天生“只认识”0 和 1。'),
     ]
