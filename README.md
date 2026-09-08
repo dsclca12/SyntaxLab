@@ -2,6 +2,8 @@
 
 Interactive learning for developers — learn TOML by writing it.
 
+Demo: https://dsclca12.github.io/SyntaxLab/
+
 SyntaxLab is a small, static learning workspace where you read a concept, edit real TOML, make mistakes, and get useful feedback. It runs entirely in the browser; progress is stored in localStorage.
 
 ## Features
