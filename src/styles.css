@@ -16,3 +16,106 @@ footer { min-height: 48px; border-top: 1px solid var(--line); display: flex; jus
 .answer-reveal { margin-top: 12px; border: 1px dashed var(--accent); border-radius: 4px; padding: 10px; background: var(--accent-soft) }
 .answer-reveal strong { color: var(--accent); font-size: 11px }
 .answer-reveal pre { color: var(--ink); margin: 8px 0 0; white-space: pre-wrap; font: 11px/1.6 'DM Mono' }
+
+/* Keep the workspace inside the viewport and give each column its own scroll area. */
+html, body, #root { min-height: 100%; }
+.app-shell { height: 100dvh; min-height: 0; overflow: hidden; }
+.layout { min-height: 0; overflow: hidden; }
+.sidebar { min-height: 0; overflow: hidden; }
+.sidebar-head, .module-switcher, .progress-track { flex: 0 0 auto; }
+.lesson-list { min-height: 0; overflow-y: auto; padding-right: 3px; }
+.main-content, .practice-panel { min-width: 0; min-height: 0; overflow-y: auto; }
+footer { flex: 0 0 48px; background: var(--bg); z-index: 2; }
+.module-group { display: grid; gap: 4px; }
+.module-switcher > button, .module-group > button { border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--muted); text-align: left; padding: 8px 9px; font-size: 11px; }
+.module-child { margin-left: 12px; padding-left: 10px !important; font-size: 10px !important; }
+.module-child span { color: var(--accent); margin-right: 4px; }
+.module-group.selected > button:first-child { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+/* Match scrollbars to the active theme instead of using the browser's white default. */
+html { scrollbar-width: thin; scrollbar-color: #454d58 #15191f; }
+* { scrollbar-width: thin; scrollbar-color: #454d58 transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #454d58; border: 2px solid transparent; border-radius: 999px; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: #606b79; border-width: 1px; }
+:root:not([data-theme='dark']) { scrollbar-color: #b9c0c9 #f0f2f5; }
+:root:not([data-theme='dark']) * { scrollbar-color: #aeb7c2 transparent; }
+:root:not([data-theme='dark']) *::-webkit-scrollbar-thumb { background: #aeb7c2; }
+
+/* Desktop navigation rail, inspired by the compact Windows side pane. */
+.sidebar-toggle { display: grid; place-items: center; border: 0; background: transparent; color: var(--muted); padding: 7px; border-radius: 4px; }
+.sidebar-toggle:hover { color: var(--accent); background: var(--surface-2); }
+.sidebar-head .sidebar-toggle { margin-left: auto; }
+.sidebar-collapsed .layout { grid-template-columns: 68px minmax(390px, 1fr) minmax(385px, 470px); }
+.sidebar-collapsed .sidebar { padding-left: 8px; padding-right: 8px; }
+.sidebar-collapsed .sidebar-head { padding-left: 0; padding-right: 0; justify-content: center; }
+.sidebar-collapsed .sidebar-head > div { display: none; }
+.sidebar-collapsed .sidebar-head .sidebar-toggle { margin-left: 0; }
+.sidebar-collapsed .module-switcher { margin-left: 0; margin-right: 0; }
+.sidebar-collapsed .module-switcher > button, .sidebar-collapsed .module-group > button { overflow: hidden; white-space: nowrap; text-align: center; padding-left: 0; padding-right: 0; font-size: 0; }
+.sidebar-collapsed .module-child { font-size: 0 !important; }
+.sidebar-collapsed .module-switcher > button:first-child::before { content: 'T'; font: 600 12px 'DM Mono'; }
+.sidebar-collapsed .module-group > button:first-child::before { content: 'C'; font: 600 12px 'DM Mono'; }
+.sidebar-collapsed .module-child::before { content: 'P'; font: 600 12px 'DM Mono'; }
+.sidebar-collapsed .module-child span { display: none; }
+.sidebar-collapsed .progress-track { margin-left: 5px; margin-right: 5px; }
+.sidebar-collapsed .lesson-item { justify-content: center; padding-left: 4px; padding-right: 4px; }
+.sidebar-collapsed .lesson-number { width: auto; }
+.sidebar-collapsed .lesson-title, .sidebar-collapsed .lesson-check, .sidebar-collapsed .reset-button span { display: none; }
+.sidebar-collapsed .reset-button { justify-content: center; padding-left: 0; padding-right: 0; }
+
+@media (min-width: 800px) and (max-width: 1050px) {
+  .sidebar-collapsed .layout { grid-template-columns: 68px minmax(300px, 1fr) minmax(300px, 34vw); }
+}
+
+@media (max-width: 799px) and (min-width: 721px) {
+  .sidebar-collapsed .layout { grid-template-columns: 68px minmax(0, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .sidebar-toggle { display: none; }
+  .sidebar-collapsed .layout { grid-template-columns: 1fr; }
+  .sidebar-collapsed .sidebar { padding-left: 16px; padding-right: 16px; }
+  .sidebar-collapsed .sidebar-head > div, .sidebar-collapsed .lesson-title, .sidebar-collapsed .lesson-check, .sidebar-collapsed .reset-button span { display: block; }
+  .sidebar-collapsed .sidebar-head { justify-content: space-between; }
+  .sidebar-collapsed .module-switcher { margin-left: 10px; margin-right: 10px; }
+  .sidebar-collapsed .module-switcher > button, .sidebar-collapsed .module-group > button { text-align: left; padding-left: 9px; padding-right: 9px; font-size: 11px; }
+  .sidebar-collapsed .module-child { font-size: 10px !important; }
+  .sidebar-collapsed .module-switcher > button:first-child::before, .sidebar-collapsed .module-group > button:first-child::before, .sidebar-collapsed .module-child::before { content: none; }
+  .sidebar-collapsed .module-child span { display: inline; }
+  .sidebar-collapsed .lesson-item { justify-content: flex-start; padding-left: 10px; padding-right: 10px; }
+}
+
+@media (max-width: 1050px) and (min-width: 721px) {
+  .layout { grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(280px, 44vh); }
+  .sidebar { grid-column: 1; grid-row: 1 / span 2; }
+  .main-content { grid-column: 2; grid-row: 1; }
+  .practice-panel { grid-column: 2; grid-row: 2; max-height: none; border-left: 0; border-top: 1px solid var(--line); padding: 25px 35px; }
+  .practice-scroll { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  footer { padding-left: 18px; padding-right: 18px; }
+  footer > span { display: none; }
+}
+
+/* Tablet landscape still has room for three focused, independently scrolling panes. */
+@media (min-width: 800px) and (max-width: 1050px) {
+  .layout { grid-template-columns: 190px minmax(300px, 1fr) minmax(300px, 34vw); grid-template-rows: minmax(0, 1fr); }
+  .sidebar { grid-column: 1; grid-row: 1; }
+  .main-content { grid-column: 2; grid-row: 1; padding: 30px 28px; }
+  .practice-panel { grid-column: 3; grid-row: 1; border-left: 1px solid var(--line); border-top: 0; padding: 24px 16px; }
+  .practice-scroll { display: flex; }
+}
+
+@media (min-width: 1051px) {
+  .main-content { scrollbar-gutter: stable; }
+  .practice-panel { scrollbar-gutter: stable; }
+  .practice-head { position: sticky; top: -30px; z-index: 1; padding-top: 30px; padding-bottom: 16px; margin-bottom: 10px; background: var(--surface); }
+}
+
+@media (max-width: 720px) {
+  .app-shell { height: auto; min-height: 100dvh; overflow: visible; }
+  .layout { display: block; min-height: 0; overflow: visible; }
+  .main-content, .practice-panel { overflow: visible; }
+  .practice-panel { border-left: 0; }
+  .practice-head { position: static; }
+}
