@@ -11,5 +11,14 @@ function formatTomlError(error: unknown): string {
 }
 export function matchesObject(value: unknown, expected: Record<string, unknown>): boolean {
   if (!value || typeof value !== 'object') return false
-  return Object.entries(expected).every(([key, expectedValue]) => JSON.stringify((value as Record<string, unknown>)[key]) === JSON.stringify(expectedValue))
+  return stableJson(value) === stableJson(expected)
+}
+
+function stableJson(value: unknown): string {
+  if (value instanceof Date) return JSON.stringify(value.toISOString())
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value as Record<string, unknown>).sort().map((key) => `${JSON.stringify(key)}:${stableJson((value as Record<string, unknown>)[key])}`).join(',')}}`
+  }
+  return JSON.stringify(value)
 }

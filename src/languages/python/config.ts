@@ -149,9 +149,7 @@ export const pythonModule: LearningModule = {
       { heading: '读错误信息的习惯', body: '报错最后一行通常告诉你错误类型，回溯中会指出文件和行号。先读类型，再回到对应行附近定位；SyntaxError 多半是语法/缩进，NameError 多半是名字不存在，TypeError 常是操作的类型不匹配。一次只改一个原因，再重新运行验证。' },
     ], 'name = "Ada"\nprint(f"Hello, {name}!")', ['能保存并运行一个 .py 文件', '能区分 print 的输出和变量的值', '知道从错误类型与行号开始排错'], [
       ex('start-1', '补全第一条输出', '补全代码，让程序输出 Hello, Python!。', 'print(', 'print("Hello, Python!")', ['输出文本要用 print。', '文本需要放在引号中。', '别忘了右括号。'], exactOr('print("Hello, Python!")', ['print(\'Hello, Python!\')']), '这条语句调用 print，把一个字符串交给解释器输出。'),
-      ex('start-2', '修复脚本文件名', '把不是 Python 源文件的名字修正为可运行的脚本名。', 'hello.txt', 'hello.py', ['Python 源文件以 .py 结尾。', '只需要修改扩展名。', '文件名主体可以保留。']),
       ex('start-3', '写出最小程序', '写一个程序：保存名字 Ada，然后输出这个名字。', '', 'name = "Ada"\nprint(name)', ['先创建变量 name。', 'Ada 是字符串，需要引号。', 'print 输出变量时不要再加引号。'], has(/name\s*=\s*["']Ada["']/i, /print\s*\(\s*name\s*\)/), '变量保存数据，print(name) 读取变量并输出它的当前值。'),
-      ex('start-4', '补全版本检查', '补全查看 Python 版本的命令。', 'python ', 'python --version', ['这条命令只检查解释器版本。', '选项由两个短横线和 version 组成。', '完整答案是 python --version。']),
       ex('start-5', '创建虚拟环境', '写出在当前项目目录创建 .venv 虚拟环境的命令。', '', 'python -m venv .venv', ['使用 python -m 可以明确由哪个解释器执行模块。', '虚拟环境模块叫 venv。', '最后写环境目录名 .venv。']),
     ], '提示：本专栏在浏览器中检查代码结构，不会在你的电脑上替你执行 Python。建议每次提交后，复制到本机解释器再跑一次。'),
     lesson('values', '02', '变量、类型与输入输出', '让程序从外界接收数据，并做出可预测的结果。', [
@@ -161,7 +159,6 @@ export const pythonModule: LearningModule = {
     ], 'name = input("姓名：")\nscore = int(input("分数："))\nprint(f"{name} 得了 {score} 分")', ['能判断常见值的类型', '能把输入转换为数字', '能用 f-string 生成清晰输出'], [
       ex('values-1', '补全数字输入', '读取一行整数并保存到 age。', 'age = ', 'age = int(input())', ['input() 的结果是字符串。', '整数转换函数叫 int。', '把 input() 放进 int()。'], has(/age\s*=\s*int\s*\(\s*input\s*\(\s*\)\s*\)/), '转换发生在输入之后：先读文本，再把文本解析成整数。'),
       ex('values-2', '修复赋值语句', '修复把姓名 Ada 保存到 name 的语句。', 'name == "Ada"', 'name = "Ada"', ['这里要“保存”，不是比较。', '保存值使用一个等号。', 'Ada 是字符串。'], has(/name\s*=\s*["']Ada["']/), '一个等号改变变量绑定，两个等号才是条件判断。'),
-      ex('values-3', '计算并输出', '读取两个整数，输出它们的和。', '', 'a = int(input())\nb = int(input())\nprint(a + b)', ['需要两次 input。', '每次输入都先用 int 转换。', '把两个变量相加交给 print。'], has(/a\s*=\s*int\s*\(\s*input\s*\(\s*\)\s*\)/, /b\s*=\s*int\s*\(\s*input\s*\(\s*\)\s*\)/, /print\s*\(\s*a\s*\+\s*b\s*\)/), '先把输入变成数，再计算；不要把两个字符串直接拼接。'),
     ]),
     lesson('strings', '03', '字符串与格式化', '处理文本、索引和输出格式，写出不靠猜的字符串程序。', [
       { heading: '字符串是有顺序的文本', body: '字符串可以索引和切片：text[0] 是第一个字符，text[-1] 是最后一个字符，text[1:4] 取下标 1、2、3。切片的结束位置不包含在结果里，这是最常见的边界错误之一。' },
@@ -170,7 +167,6 @@ export const pythonModule: LearningModule = {
     ], 'raw = "  Python  "\nword = raw.strip().lower()\nprint(f"语言：{word}")', ['能正确使用索引和切片', '会调用常用字符串方法', '能写出指定格式的文本输出'], [
       ex('strings-1', '补全切片', '取出 text 的前 3 个字符。', 'text[', 'text[:3]', ['切片左边空着表示从头开始。', '结束位置写 3。', '切片不包含下标 3。']),
       ex('strings-2', '清理用户输入', '把 name 两端的空格去掉，并把结果保存回 name。', 'name = name.', 'name = name.strip()', ['去两端空白的方法是 strip。', '方法需要括号。', '要重新赋值，清理结果才会保存。'], has(/name\s*=\s*name\.strip\s*\(\s*\)/), 'strip() 返回清理后的新字符串，不会自动改变原变量。'),
-      ex('strings-3', '生成报名信息', '输出“姓名：Ada，科目：Python”，使用变量 name 和 subject。', 'name = "Ada"\nsubject = "Python"\n', 'name = "Ada"\nsubject = "Python"\nprint(f"姓名：{name}，科目：{subject}")', ['先保留两行变量定义。', 'f-string 以 f 开头。', '变量放在大括号里。'], has(/name\s*=\s*["']Ada["']/i, /subject\s*=\s*["']Python["']/i, /print\s*\(\s*f["']姓名：\{name\}，科目：\{subject\}["']\s*\)/), 'f-string 把数据和展示格式分开，修改变量后输出会自动更新。'),
     ]),
     lesson('conditions', '04', '条件、比较与布尔逻辑', '把“如果……那么……”翻译成清楚、可检查的代码。', [
       { heading: '条件是一条问题', body: 'if 后面必须是能得到 True 或 False 的表达式，并以冒号结束。常见比较符号有 ==、!=、>、>=、<、<=。代码块由缩进决定，建议始终使用 4 个空格。' },
@@ -179,7 +175,6 @@ export const pythonModule: LearningModule = {
     ], 'score = int(input())\nif score >= 60:\n    print("及格")\nelse:\n    print("继续努力")', ['能写出带冒号和缩进的分支', '能区分 > 与 >= 的边界', '能组合两个布尔条件'], [
       ex('conditions-1', '补全及格条件', '60 分也算及格，补全 if 条件。', 'if score ', 'if score >= 60:', ['“包含 60”意味着要带等号。', '大于等于写作 >=。', '条件行末尾要有冒号。'], has(/if\s+score\s*>=\s*60\s*:/), '边界值 60 是测试条件的好例子：先写规则，再用 59、60、61 验证。'),
       ex('conditions-2', '修复登录判断', '只有用户名和密码都正确时才输出登录成功。', 'if user == "admin" or password == "1234":\n    print("登录成功")', 'if user == "admin" and password == "1234":\n    print("登录成功")', ['两个条件必须同时成立。', '同时成立使用 and。', '保留两个比较和缩进。'], has(/if\s+user\s*==\s*["']admin["']\s+and\s+password\s*==\s*["']1234["']\s*:/), 'or 会让“只对一个条件”也通过；权限判断通常需要 and。'),
-      ex('conditions-3', '写出分级程序', 'score >= 90 输出 A，否则 score >= 60 输出 B，否则输出 C。', '', 'if score >= 90:\n    print("A")\nelif score >= 60:\n    print("B")\nelse:\n    print("C")', ['第一档先判断更高分数。', '第二档使用 elif。', '每个分支的 print 都要缩进。'], has(/if\s+score\s*>=\s*90\s*:/, /elif\s+score\s*>=\s*60\s*:/, /else\s*:/, /print\s*\(\s*["']A["']\s*\)/, /print\s*\(\s*["']B["']\s*\)/, /print\s*\(\s*["']C["']\s*\)/), '从最严格的条件开始写，避免 95 分先被“>= 60”截走。'),
     ]),
     lesson('loops', '05', '循环与循环不变量', '让重复工作可控，学会追踪每一轮的变量变化。', [
       { heading: 'for 适合遍历', body: 'for item in items 会依次取出每个元素。range(start, stop, step) 生成整数序列，stop 永远不包含在内；range(1, 4) 是 1、2、3。' },
@@ -188,7 +183,6 @@ export const pythonModule: LearningModule = {
     ], 'total = 0\nfor number in range(1, 6):\n    total += number\nprint(total)', ['能读懂 range 的开闭范围', '能写出不会死循环的 while', '能用累加器解决求和问题'], [
       ex('loops-1', '补全遍历范围', '打印 1、2、3，补全 range。', 'for number in range(', 'for number in range(1, 4):\n    print(number)', ['range 的结束值不包含。', '要包含 3，结束值写 4。', '循环体需要缩进并打印 number。'], has(/for\s+number\s+in\s+range\s*\(\s*1\s*,\s*4\s*\)\s*:/, /print\s*\(\s*number\s*\)/), '把“包含 1 到 3”翻译成 range(1, 4)，这是边界思维的基本训练。'),
       ex('loops-2', '修复 while 出口', '修复循环变量没有变化的问题，让程序输出 0、1、2 后停止。', 'i = 0\nwhile i < 3:\n    print(i)', 'i = 0\nwhile i < 3:\n    print(i)\n    i += 1', ['条件依赖 i。', '每轮输出后让 i 增加。', '使用 i += 1。'], has(/while\s+i\s*<\s*3\s*:/, /print\s*\(\s*i\s*\)/, /i\s*\+=\s*1/), '检查 while 时必须同时找“条件”和“改变条件的语句”。'),
-      ex('loops-3', '统计满足条件的数', '统计 1 到 10 中偶数的个数。', '', 'count = 0\nfor number in range(1, 11):\n    if number % 2 == 0:\n        count += 1\nprint(count)', ['先准备 count = 0。', '偶数除以 2 的余数是 0。', '满足条件时把 count 加 1。'], has(/count\s*=\s*0/, /for\s+number\s+in\s+range\s*\(\s*1\s*,\s*11\s*\)\s*:/, /if\s+number\s*%\s*2\s*==\s*0\s*:/, /count\s*\+=\s*1/, /print\s*\(\s*count\s*\)/), '“统计”通常需要计数器；先判断，再更新计数器。'),
     ]),
     lesson('collections', '06', '列表、字典与可变数据', '选择合适的数据结构，并能安全地遍历和更新它们。', [
       { heading: '列表保存有顺序的数据', body: '列表可以放多个值，索引从 0 开始。append(value) 在末尾添加，len(items) 获取长度，for item in items 遍历全部元素。不要把“第几个”误当成“下标几”。' },
@@ -197,7 +191,6 @@ export const pythonModule: LearningModule = {
     ], 'scores = [72, 88, 91]\nscores.append(95)\nstudent = {"name": "Ada", "score": max(scores)}\nprint(student["score"])', ['能使用列表索引、append 和 len', '能读写字典键值', '能选择列表或字典表达数据关系'], [
       ex('collections-1', '补全列表访问', '取出 names 的最后一个元素。', 'names[', 'names[-1]', ['最后一个元素可以用负索引。', '负索引从 -1 开始。', '补上右方括号。']),
       ex('collections-2', '修复字典访问', '修复读取 student 中 score 的语句。', 'print(student.score)', 'print(student["score"])', ['字典不是对象属性访问。', '用方括号写键。', 'score 是字符串键。'], has(/print\s*\(\s*student\s*\[\s*["']score["']\s*\]\s*\)/), '点号适合对象属性；字典的键值访问使用方括号。'),
-      ex('collections-3', '筛选高分', '输出 scores 中所有大于等于 80 的分数。', '', 'for score in scores:\n    if score >= 80:\n        print(score)', ['遍历列表中的每个 score。', '条件要包含 80。', 'print 放在 if 代码块内。'], has(/for\s+score\s+in\s+scores\s*:/, /if\s+score\s*>=\s*80\s*:/, /print\s*\(\s*score\s*\)/), '先遍历，再筛选；把 print 缩进到 if 下面就不会输出低分。'),
     ]),
     lesson('functions', '07', '函数：拆分问题与返回结果', '把重复逻辑封装成可测试、可复用的小部件。', [
       { heading: '函数有输入和输出', body: 'def 定义函数，参数是调用者提供的输入，return 是函数交还的结果。return 会立即结束函数；没有 return 时，函数默认返回 None。不要把 print 的展示误当成 return 的结果。' },
@@ -206,7 +199,6 @@ export const pythonModule: LearningModule = {
     ], 'def is_even(number):\n    return number % 2 == 0\n\nprint(is_even(8))', ['能定义带参数的函数', '能正确使用 return', '能把一段重复逻辑提取出来'], [
       ex('functions-1', '补全返回值', '定义 add(a, b)，返回两个参数的和。', 'def add(a, b):\n', 'def add(a, b):\n    return a + b', ['函数体需要缩进。', '返回语句是 return。', '返回 a + b。'], has(/def\s+add\s*\(\s*a\s*,\s*b\s*\)\s*:/, /return\s+a\s*\+\s*b/), 'return 让调用者拿到结果，所以 result = add(2, 3) 可以继续参与计算。'),
       ex('functions-2', '修复函数调用', '调用 greet 函数，并把返回值保存到 message。', 'message = greet', 'message = greet("Ada")', ['调用函数需要括号。', '把 Ada 作为字符串参数。', '保存调用结果到 message。'], has(/message\s*=\s*greet\s*\(\s*["']Ada["']\s*\)/), '写函数名不等于调用函数；括号表示现在传入参数并执行。'),
-      ex('functions-3', '写一个折扣函数', '定义 final_price(price)，价格满 100 打 9 折，否则原价返回。', '', 'def final_price(price):\n    if price >= 100:\n        return price * 0.9\n    return price', ['先写函数头和参数。', '满 100 的条件是 >= 100。', '两个分支都要 return。'], has(/def\s+final_price\s*\(\s*price\s*\)\s*:/, /if\s+price\s*>=\s*100\s*:/, /return\s+price\s*\*\s*0\.9/, /return\s+price/), '让函数覆盖两个分支，并分别测试 99、100 和 150。'),
     ]),
     lesson('files', '08', '文件、异常与资源管理', '让程序能读取真实数据，并面对输入不理想的情况。', [
       { heading: '用 with 管理文件', body: 'with open("notes.txt", encoding="utf-8") as file: 会在代码块结束时自动关闭文件。读取文本常用 read、readline 或 for line in file；写入时要明确 w 会覆盖原内容，a 会追加到末尾。' },
@@ -215,7 +207,6 @@ export const pythonModule: LearningModule = {
     ], 'try:\n    age = int(input("年龄："))\nexcept ValueError:\n    print("请输入整数")\nelse:\n    print(f"明年：{age + 1}")', ['能用 with 读取文本文件', '知道 r、w、a 的区别', '能捕获具体异常并给出反馈'], [
       ex('files-1', '修复文件模式', '以追加模式打开 log.txt。', 'with open("log.txt", "w") as file:', 'with open("log.txt", "a") as file:', ['w 会覆盖旧内容。', '追加模式是 a。', '保留 with 和 as file 的结构。'], has(/with\s+open\s*\(\s*["']log\.txt["']\s*,\s*["']a["']\s*\)\s+as\s+file\s*:/), '涉及日志时通常不希望每次运行都抹掉历史，先判断需求再选模式。'),
       ex('files-2', '补全安全读取', '使用 with 读取 data.txt 的全部内容，并保存到 content。', 'with open("data.txt", encoding="utf-8") as file:\n', 'with open("data.txt", encoding="utf-8") as file:\n    content = file.read()', ['文件代码块要缩进。', '读取全部内容的方法是 read。', '把结果保存到 content。'], has(/with\s+open\s*\(\s*["']data\.txt["']\s*,\s*encoding\s*=\s*["']utf-8["']\s*\)\s+as\s+file\s*:/, /content\s*=\s*file\.read\s*\(\s*\)/), 'with 同时表达“打开、使用、自动关闭”，比手动 close 更不容易漏资源。'),
-      ex('files-3', '处理无效输入', '修复代码：输入不是整数时输出“请输入整数”。', 'try:\n    age = int(input())\nexcept TypeError:\n    print("请输入整数")', 'try:\n    age = int(input())\nexcept ValueError:\n    print("请输入整数")', ['int 转换文本失败会产生 ValueError。', '缩进要保持一致。', '只替换异常类型。'], has(/try\s*:/, /age\s*=\s*int\s*\(\s*input\s*\(\s*\)\s*\)/, /except\s+ValueError\s*:/, /print\s*\(\s*["']请输入整数["']\s*\)/), '异常类型要对应失败原因：文本不能转换成整数通常是 ValueError，不是 TypeError。'),
     ]),
     lesson('modules', '09', '模块、标准库与可读性', '学会复用已有能力，而不是把所有代码堆在一个文件里。', [
       { heading: 'import 是依赖声明', body: 'import math 后通过 math.sqrt(9) 使用模块里的函数；from random import randint 则直接引入名字。导入通常放在文件顶部，便于读者知道程序依赖什么。' },
@@ -224,7 +215,6 @@ export const pythonModule: LearningModule = {
     ], 'from math import sqrt\n\nside = float(input())\narea = side * side\nprint(f"面积：{area:g}")\nprint(f"对角线：{side * sqrt(2):.2f}")', ['能读懂 import 和 from ... import', '知道常见标准库的适用场景', '能用命名和拆分提升可读性'], [
       ex('modules-1', '补全模块调用', '导入 math，并计算 16 的平方根。', 'import math\nprint(', 'import math\nprint(math.sqrt(16))', ['模块名是 math。', '平方根函数是 sqrt。', '调用时要写 math.sqrt。'], has(/import\s+math/, /print\s*\(\s*math\.sqrt\s*\(\s*16\s*\)\s*\)/), 'math.sqrt(16) 说明“函数属于哪个模块”，点号不要省略。'),
       ex('modules-2', '修复导入方式', '修复导入 randint 的语句。', 'import random.randint', 'from random import randint', ['from ... import ... 是直接导入名字的写法。', '模块名是 random。', '被导入的函数是 randint。'], has(/from\s+random\s+import\s+randint/), '两种 import 写法都能复用能力，但调用形式不同：random.randint(...) 或 randint(...)。'),
-      ex('modules-3', '写一个可复用统计函数', '定义 average(numbers)，返回列表 numbers 的平均值。', '', 'def average(numbers):\n    return sum(numbers) / len(numbers)', ['总和函数是 sum。', '元素个数用 len。', '平均值是总和除以个数。'], has(/def\s+average\s*\(\s*numbers\s*\)\s*:/, /return\s+sum\s*\(\s*numbers\s*\)\s*\/\s*len\s*\(\s*numbers\s*\)/), '把统计逻辑封装后，任何同样结构的数字列表都可以复用；同时要思考空列表这个边界。'),
     ]),
     lesson('algorithm', '10', '综合题：把需求变成程序', '用“输入—处理—输出—测试”完成一个小型真实任务。', [
       { heading: '先写数据流', body: '拿到题目不要立刻敲代码。先写输入是什么、输出是什么、中间需要哪些变量；再用一个最小样例手算。这样能把“不会写”拆成几个可验证的小问题。' },
