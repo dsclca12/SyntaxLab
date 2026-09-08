@@ -158,3 +158,25 @@ html { scrollbar-width: thin; scrollbar-color: #454d58 #15191f; }
 .resource-list strong { color: var(--accent); font-size: 12px; }
 .resource-list span { color: var(--muted); font-size: 11px; line-height: 1.5; }
 @media (max-width: 720px) { .walkthrough-step { grid-template-columns: 1fr; gap: 5px; } }
+
+/* Full-length source lessons keep their original hierarchy instead of being compressed into cards. */
+.markdown-content { color: var(--muted); font-size: 14px; line-height: 1.8; }
+.markdown-content h2, .markdown-content h3, .markdown-content h4 { color: var(--ink); margin: 42px 0 12px; line-height: 1.3; }
+.markdown-content h2 { font-size: 22px; letter-spacing: -.4px; }
+.markdown-content h3 { font-size: 17px; }
+.markdown-content h4 { font-size: 15px; }
+.markdown-content p { margin: 0 0 17px !important; }
+.markdown-content ul, .markdown-content ol { margin: 0 0 20px; padding-left: 22px; }
+.markdown-content li + li { margin-top: 5px; }
+.markdown-content code { font: .92em 'DM Mono'; color: var(--accent); background: var(--surface-2); padding: 1px 4px; border-radius: 3px; }
+.markdown-content pre { margin: 22px 0; padding: 18px; overflow-x: auto; border-radius: 7px; color: var(--code-ink); background: var(--code); box-shadow: var(--shadow); }
+.markdown-content pre code { padding: 0; color: inherit; background: transparent; font: 13px/1.8 'DM Mono'; }
+.markdown-code { position: relative; }
+.markdown-code pre { margin: 22px 0; }
+.markdown-code button { position: absolute; top: 30px; right: 9px; z-index: 1; border: 1px solid #46505d; border-radius: 4px; padding: 4px 8px; color: #c9d2dc; background: #20262e; font: 10px 'DM Mono'; }
+.markdown-code button:hover { border-color: var(--accent); color: white; }
+.markdown-content hr { border: 0; border-top: 1px solid var(--line); margin: 34px 0; }
+.markdown-table-wrap { overflow-x: auto; margin: 20px 0; }
+.markdown-content table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.markdown-content th, .markdown-content td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+.markdown-content th { color: var(--ink); background: var(--surface-2); }

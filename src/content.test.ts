@@ -4,6 +4,8 @@ import { computerModule } from './languages/computer/config'
 import { pythonModule } from './languages/python/config'
 import { tomlModule } from './languages/toml/config'
 import { tomlChinese } from './languages/toml/i18n'
+import { binaryModule } from './languages/binary/config'
+import { hexadecimalModule } from './languages/hexadecimal/config'
 
 describe('learning content contracts', () => {
   it('keeps TOML examples annotated and exercises intentionally small', () => {
@@ -40,6 +42,15 @@ describe('learning content contracts', () => {
           expect(exercise.validate(exercise.solution, exercise.solution), exercise.id).toBe(true)
         }
       }
+    }
+  })
+
+  it('keeps the binary and hexadecimal source explanations intact in the app', () => {
+    for (const module of [binaryModule, hexadecimalModule]) {
+      expect(module.lessons.every((lesson) => (lesson.content?.length ?? 0) > 500), module.id).toBe(true)
+      expect(module.lessons.reduce((total, lesson) => total + (lesson.content?.length ?? 0), 0), module.id).toBeGreaterThan(14_000)
+      expect(module.lessons.some((lesson) => lesson.content?.includes('常见误区')), module.id).toBe(true)
+      expect(module.lessons.every((lesson) => !lesson.content?.includes('自测题')), module.id).toBe(true)
     }
   })
 })

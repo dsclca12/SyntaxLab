@@ -1,4 +1,5 @@
 import type { Exercise, LearningModule, WalkthroughStep } from '../../core/types'
+import binarySource from './source.md?raw'
 
 const binary = (value: number) => value.toString(2)
 const compact = (source: string) => source.toLowerCase().replace(/\s+/g, '').replace(/[，。；：、]/g, '')
@@ -77,8 +78,21 @@ export const createBinaryExercises = (lessonId: string, seed: number): Exercise[
 }
 
 type BinaryLessonOptions = { walkthrough: WalkthroughStep[]; checkpoints: string[]; note: string; goals: string[] }
+const between = (start: string, end?: string) => {
+  const from = binarySource.indexOf(start)
+  const to = end ? binarySource.indexOf(end, from) : binarySource.length
+  return binarySource.slice(from, to === -1 ? binarySource.length : to).trim()
+}
+const binaryContent: Record<string, string> = {
+  overview: between('## 1. 学习目标', '# 6. 二进制计数'),
+  'place-value': between('# 6. 二进制计数', '# 8. 二进制 → 十进制'),
+  conversion: between('# 8. 二进制 → 十进制', '# 10. 二进制加法'),
+  arithmetic: between('# 10. 二进制加法', '# 13. 为什么计算机适合使用二进制'),
+  bytes: between('# 13. 为什么计算机适合使用二进制', '# 17. 和 C / Python 的联系'),
+  code: `${between('# 17. 和 C / Python 的联系', '# 22. 自测题')}\n\n${between('# 24. 一页速查表')}`,
+}
 const binaryLesson = (id: string, number: string, title: string, summary: string, sections: { heading: string; body: string }[], example: string, options: BinaryLessonOptions): LearningModule['lessons'][number] => ({
-  id, number, title, eyebrow: 'BINARY FOUNDATIONS', summary, sections, example, walkthrough: options.walkthrough, checkpoints: options.checkpoints, note: options.note, goals: options.goals, exercises: [],
+  id, number, title, eyebrow: 'BINARY FOUNDATIONS', summary, sections, example, content: binaryContent[id], walkthrough: options.walkthrough, checkpoints: options.checkpoints, note: options.note, goals: options.goals, exercises: [],
 })
 
 export const binaryModule: LearningModule = {
@@ -91,12 +105,12 @@ export const binaryModule: LearningModule = {
   description: '从 bit、位权和进制转换开始，理解计算机为什么用 0 和 1 表示信息。',
   exerciseFactory: createBinaryExercises,
   lessons: [
-    binaryLesson('overview', '01', '二进制：为什么是 0 和 1', '先建立一张可靠的地图：状态、噪声、晶体管，以及“二进制”与“数字字符串”的区别。', [
+    binaryLesson('overview', '01', '基础：bit、Byte 与 8 bit', '从原稿建立完整的 bit、Byte、进制与 8 bit 基础。', [
       { heading: '学习目标', body: '学完这一课，你应该能解释 bit 是什么、n 个 bit 能表示多少状态，并用自己的话说明电子计算机为什么适合采用二进制。' },
       { heading: '两种状态是一种工程选择', body: '真实电子信号会有噪声和波动。电路只区分低电平与高电平时，可以留下更大的安全区间；晶体管也容易在导通与截止等状态之间工作。工程师把这些物理状态抽象为 0 和 1，再组合成逻辑门、寄存器和 CPU。' },
       { heading: '不要把写法当成数值', body: '10₂ 表示 2，而 10₁₀ 表示 10。下标或代码前缀告诉我们如何解释数字字符串；解释完成后，它们都表示一个普通整数。' },
     ], '物理状态 → 0 / 1 → 逻辑门 → 寄存器 → CPU\n10₂ = 2₁₀\nn 个 bit → 2ⁿ 种状态', { walkthrough: [{ code: '低电平 / 高电平', explanation: '电路先区分两种稳定的物理区域，而不是直接存储字符“0”和“1”。' }, { code: '0 / 1', explanation: '这是对两种物理状态的抽象编码。' }, { code: '2ⁿ', explanation: '每个 bit 都有两种选择，n 个独立位置的组合数就是 2ⁿ。' }], checkpoints: ['不看资料，用三句话解释“噪声为什么让二进制有优势”。', '列出 0、1、10、11、100，并在旁边写十进制值。', '说明 10₂ 为什么不是十。'], note: '“计算机只认识 0 和 1”是结果，不是完整原因；真正的起点是可靠的物理状态。', goals: ['解释 bit 与状态的关系', '推导 n 个 bit 的状态数量', '说清楚二进制的工程原因'] }),
-    binaryLesson('place-value', '02', '位权：每一位为什么是 1、2、4、8', '用十进制的个位、十位作对照，理解二进制从右到左的 2⁰、2¹、2²……。', [
+    binaryLesson('place-value', '02', '计数与位权：1、2、4、8', '从计数规律推导二进制的位权。', [
       { heading: '进制的共同规则', body: 'b 进制使用 b 个基本数字，每向左移动一位，位权乘以 b。十进制的位权是 10⁰、10¹、10²；二进制的位权则是 2⁰、2¹、2²。' },
       { heading: '按位加权求和', body: '二进制 10110₂ 的位权从右到左是 1、2、4、8、16。只有写成 1 的位置贡献权值，所以 10110₂ = 16 + 4 + 2 = 22₁₀。' },
       { heading: '2 的幂很特别', body: '二进制中 2ⁿ 只有一个 1，后面跟 n 个 0：1000₂ = 8，10000₂ = 16。这个规律是估算和转换的快捷方式。' },
@@ -111,12 +125,12 @@ export const binaryModule: LearningModule = {
       { heading: '减法规则', body: '0−0=0，1−0=1，1−1=0。遇到 0−1 时要从高位借 1，在当前位它变成 10₂，因此 10₂−1₂=1₂。' },
       { heading: '连续借位', body: '10000₂−1₂ 的结果是 01111₂。中间连续的 0 会把借来的 1 继续传递到右侧，这和十进制 10000−1=9999 的结构完全相同。' },
     ], '   1011\n + 0110\n ------\n  10001\n\n   10000\n - 00001\n ------\n   01111', { walkthrough: [{ code: '1 + 1 = 10₂', explanation: '二进制到 2 就要进位，本位只保留 0。' }, { code: '10₂ − 1₂ = 1₂', explanation: '借来的高位 1 在当前位提供了两个单位。' }, { code: '10000₂ − 1₂', explanation: '连续借位后，右侧四位都变成 1。' }], checkpoints: ['计算 1011₂ + 1101₂，并用十进制检查。', '计算 11010₂ − 1011₂。', '解释为什么 2ⁿ−1 的二进制是 n 个 1。'], note: '先对齐位数，再从右向左计算；十进制换算是很好的自检手段。', goals: ['完成二进制加法', '完成需要借位的二进制减法', '用十进制验证结果'] }),
-    binaryLesson('bytes', '05', 'bit、Byte 与数据范围', '把单个位、字节、无符号整数范围和 CPU 字长放在同一张图里，避免单位混淆。', [
+    binaryLesson('bytes', '05', '为什么计算机使用二进制', '从噪声与晶体管的物理特性理解二进制。', [
       { heading: 'bit 与 Byte', body: 'bit 是 binary digit，一个 bit 只有 0 或 1 两种状态。Byte 是一组 bit；现代通用计算机通常约定 1 Byte = 8 bit。大小写很重要：b 常表示 bit，B 常表示 Byte。' },
       { heading: '8 bit 能表示什么', body: '8 bit 有 2⁸=256 种组合。若用于无符号整数并从 0 开始编号，范围是 0 到 255，最大值是 2⁸−1，而不是 256。' },
       { heading: 'Byte 不等于 CPU 字长', body: 'Byte 是数据组织和寻址常用的单位；CPU 字长描述处理器更适合处理的位宽，常见有 32 bit、64 bit。1 Byte=8 bit 并不意味着 CPU 一次只能处理 8 bit。' },
     ], '1 Byte = 8 bit\n8 bit → 2⁸ = 256 种状态\n无符号范围：0 ～ 255\nByte 大小 ≠ CPU 字长', { walkthrough: [{ code: 'b / B', explanation: '网络速率里的 Mbps 是 megabits；文件容量里的 MB 是 megabytes，不能只看字母数量。' }, { code: '2ⁿ 种状态', explanation: '状态数从 0 开始编号时，最大编号自然是 2ⁿ−1。' }, { code: '8 bit Byte / 64 bit CPU', explanation: '数据单位和处理宽度是两个不同维度。' }], checkpoints: ['写出 4 bit 的状态数量和无符号范围。', '解释 8 Mb 与 8 MB 的区别。', '说明为什么 CPU 是 64 bit 时，Byte 仍通常是 8 bit。'], note: '单位换算先看 b/B，再看上下文是容量、速率还是处理宽度。', goals: ['区分 bit 和 Byte', '计算 n bit 的无符号范围', '区分 Byte 与 CPU 字长'] }),
-    binaryLesson('code', '06', 'C / Python：代码里的二进制表示', '看到 0b、bin() 和 sizeof() 时，能把源码写法、整数值和内存单位分开理解。', [
+    binaryLesson('code', '06', '代码、系统与常见误区', '把二进制放进 C、Python、Linux 和实际系统语境中。', [
       { heading: '0b 是字面量前缀', body: '在 Python 以及许多现代编译器支持的 C 写法中，0b1010 表示按二进制解释后面的数字。10 和 0b1010 表示同一个整数，只是源码写法不同。' },
       { heading: 'bin() 返回什么', body: 'Python 的 bin(10) 返回字符串 0b1010。它是展示形式，不代表整数内部存在“十进制版”和“二进制版”两个版本。' },
       { heading: 'sizeof 与 bit 宽度', body: 'C 的 sizeof(x) 结果单位是 Byte。sizeof(char) 按语言定义为 1 个 C 字节；具体一个 C 字节包含多少 bit 要看实现，现代通用机器上通常是 8 bit。' },

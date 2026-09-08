@@ -1,4 +1,5 @@
 import type { Exercise, LearningModule, WalkthroughStep } from '../../core/types'
+import hexadecimalSource from './source.md?raw'
 
 const compact = (source: string) => source.toLowerCase().replace(/\s+/g, '').replace(/[，。；：、]/g, '')
 const randomInt = (seed: number, min: number, max: number) => {
@@ -85,8 +86,20 @@ export const createHexadecimalExercises = (lessonId: string, seed: number): Exer
 }
 
 type HexLessonOptions = { walkthrough: WalkthroughStep[]; checkpoints: string[]; note: string; goals: string[] }
+const between = (start: string, end?: string) => {
+  const from = hexadecimalSource.indexOf(start)
+  const to = end ? hexadecimalSource.indexOf(end, from) : hexadecimalSource.length
+  return hexadecimalSource.slice(from, to === -1 ? hexadecimalSource.length : to).trim()
+}
+const hexadecimalContent: Record<string, string> = {
+  overview: between('## 1. 学习目标', '# 5. 为什么十六进制和二进制关系特别密切'),
+  mapping: between('# 5. 为什么十六进制和二进制关系特别密切', '# 12. 三个必须形成条件反射的值'),
+  'place-value': between('# 12. 三个必须形成条件反射的值', '# 16. 为什么地址经常用十六进制'),
+  bytes: between('# 16. 为什么地址经常用十六进制', '# 23. C 中如何体现'),
+  notation: `${between('# 23. C 中如何体现', '# 29. 自测题')}\n\n${between('# 31. 一页速查表')}`,
+}
 const hexLesson = (id: string, number: string, title: string, summary: string, sections: { heading: string; body: string }[], example: string, options: HexLessonOptions): LearningModule['lessons'][number] => ({
-  id, number, title, eyebrow: 'HEXADECIMAL', summary, sections, example, walkthrough: options.walkthrough, checkpoints: options.checkpoints, note: options.note, goals: options.goals, exercises: [],
+  id, number, title, eyebrow: 'HEXADECIMAL', summary, sections, example, content: hexadecimalContent[id], walkthrough: options.walkthrough, checkpoints: options.checkpoints, note: options.note, goals: options.goals, exercises: [],
 })
 
 export const hexadecimalModule: LearningModule = {
@@ -99,7 +112,7 @@ export const hexadecimalModule: LearningModule = {
   description: '理解 0x、A～F 与 4 bit 分组，把二进制数据读成紧凑的人类表示。',
   exerciseFactory: createHexadecimalExercises,
   lessons: [
-    hexLesson('overview', '01', '十六进制：给二进制一个短写法', '从 0～9、A～F 和 16 = 2⁴ 出发，理解十六进制为什么适合底层数据。', [
+    hexLesson('overview', '01', '十六进制与位权', '完整建立十六进制的定义、符号和位权。', [
       { heading: '十六进制使用 16 个数字符号', body: '十六进制是以 16 为基数的位置计数系统，使用 0～9 和 A～F，其中 A=10、B=11、C=12、D=13、E=14、F=15。大小写通常不影响数值。' },
       { heading: '核心原因：16 = 2⁴', body: '4 个二进制位有 2⁴=16 种组合，正好可以和一个十六进制位一一对应。因此十六进制比二进制短很多，同时保留清晰的位边界。' },
       { heading: '计算机并不是用十六进制计算', body: '硬件最终处理二进制状态；十六进制主要是给人看的紧凑表示。地址、机器码、内存转储和位掩码使用它，是因为它能让二进制结构更容易阅读。' },
@@ -109,17 +122,17 @@ export const hexadecimalModule: LearningModule = {
       { heading: '十六进制转二进制', body: '每一个十六进制数字展开成 4 个 bit：3→0011，A→1010，F→1111。因此 0x3F = 0011 1111₂。' },
       { heading: '一字节正好是两位十六进制', body: '1 Byte 通常是 8 bit，而 1 个十六进制位是 4 bit，所以 2 个十六进制位正好描述 1 个 Byte，范围是 00～FF。' },
     ], '二进制：1010 1101\n十六进制： A    D\n结果：0xAD', { walkthrough: [{ code: '101101₂ → 0010 1101', explanation: '从右向左分组，左边不足 4 位补 0。' }, { code: '0010 → 2，1101 → D', explanation: '每组直接查映射表，无需绕道十进制。' }, { code: '0xAD → 1010 1101', explanation: '反向时每个十六进制位固定展开为 4 位。' }], checkpoints: ['转换 1111 0000₂ 和 0x7F。', '说明为什么前导 0 不改变整数值。', '熟记 0000～1111 与 0～F 的映射。'], note: '二进制和十六进制互转时优先按 4 位分组，不要先转十进制。', goals: ['完成二进制到十六进制转换', '完成十六进制到二进制转换', '理解十六进制位与 Byte 的关系'] }),
-    hexLesson('place-value', '03', '位权：0x10 为什么是 16', '把十进制位权的思路迁移到基数 16，能手算常见十六进制值。', [
+    hexLesson('place-value', '03', '高频值、前缀与位模式', '理解 0x、常用值、表示形式与实际位模式。', [
       { heading: '位权仍然从右到左增长', body: '十六进制的位权是 16⁰、16¹、16²……。例如 0x2F = 2×16 + 15 = 47。' },
       { heading: '高频位权', body: '16⁰=1、16¹=16、16²=256、16³=4096、16⁴=65536。于是 0x10=16，0x100=256，0x1000=4096。' },
       { heading: '不要把书写方式当成数字本身', body: '0xFF、255 和 11111111₂ 可以表示同一个数学数值 255。0x 只是提示后面的字符按十六进制解释，不会作为额外字符存进整数。' },
     ], '0x2F = 2 × 16¹ + 15 × 16⁰\n     = 32 + 15\n     = 47', { walkthrough: [{ code: '0x10', explanation: '1×16 + 0 = 16，不是十进制的 10。' }, { code: '0xFF', explanation: '15×16 + 15 = 255。' }, { code: '0x100', explanation: '1×16² = 256；每多一个十六进制位，位权乘以 16。' }], checkpoints: ['手算 0x20、0x7F、0x80、0x100。', '解释 0x 前缀的作用，以及它不是什么。', '区分 0x80 这个数值和 10000000 这个位模式。'], note: '见到 0x10、0x100、0x1000 时，优先联想到 16、256、4096。', goals: ['使用 16 的幂展开十六进制', '快速判断常见十六进制值', '解释 0x 前缀'] }),
-    hexLesson('bytes', '04', 'Byte、地址与颜色', '把十六进制放进真实场景：内存地址、机器码、内存转储和 RGB 颜色。', [
+    hexLesson('bytes', '04', '地址、机器码、颜色与综合例子', '用原稿中的真实场景和综合例子建立联系。', [
       { heading: '地址和机器码', body: '一个长地址或机器码用二进制写会很难读；按 4 bit 压缩后，0x7FFD2000、DE AD BE EF 等形式更短，也仍然保留字节和位的边界。DE AD BE EF 只是 4 个字节，具体含义取决于上下文。' },
       { heading: 'RGB 颜色', body: '颜色 #RRGGBB 可以拆成三个字节。例如 #FF8000 = R:FF、G:80、B:00，也就是 255、128、0。# 是颜色语法，和代码中的 0x 前缀不是同一种语法。' },
       { heading: '一个数量关系', body: '1 hex digit = 4 bits；2 hex digits = 8 bits = 1 Byte；8 hex digits = 32 bits = 4 Bytes。这个关系能帮助你读懂 dump、协议和调试器输出。' },
     ], '地址：0x7FFD2000\n字节：DE AD BE EF\n颜色：#FF8000 → 255, 128, 0', { walkthrough: [{ code: '0x7FFD2000', explanation: '这是一个用十六进制展示的数，在某些上下文中可能是内存地址。' }, { code: 'DE AD BE EF', explanation: '每两位是一个字节；它们究竟是整数、指令还是文件内容要看上下文。' }, { code: '#FF8000', explanation: '按 RR、GG、BB 拆成三个 0～255 的通道值。' }], checkpoints: ['看到 0xFFFFFFFF 时说出它包含多少 bit 和 Byte。', '把 #FF8000 拆成 R、G、B 的十进制值。', '解释为什么地址通常不用二进制或十进制直接展示。'], note: '十六进制显示的是数据的表示形式；不要只凭外观猜测这些字节的语义。', goals: ['读懂常见地址和字节转储', '拆解 RGB 十六进制颜色', '换算十六进制位数与 bit/Byte'] }),
-    hexLesson('notation', '05', '代码里的十六进制', '在 C 和 Python 中读懂 0x、hex()、%x，并分清无符号数值与有符号解释。', [
+    hexLesson('notation', '05', '代码、系统与常见误区', '在 C、Python、Linux 中完整理解十六进制。', [
       { heading: 'C / Python 的 0x', body: 'C 和 Python 都支持类似 0xFF 的整数写法。它和 255 是同一个整数的不同表示；输出时使用 %d、%x 或 hex()，只是选择不同的展示方式。' },
       { heading: '同一位模式可以有不同解释', body: '0x80 作为普通数值是 128。若把 8 位模式 10000000 按 int8_t 的有符号补码规则解释，则是 -128。冲突不在十六进制，而在位宽与类型解释。' },
       { heading: '四个概念要分开', body: '阅读底层代码时分别问：这是数值、书写形式、位模式，还是某种数据类型对位模式的解释？这能避免把 0x80 一律理解成 -128。' },
