@@ -50,7 +50,7 @@ The application consumes a `LearningModule` made of lessons and exercises. TOML 
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Small, focused improvements and new exercises are welcome.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [维护指南](docs/MAINTAINING.md). Small, focused improvements and new exercises are welcome.
 
 ## License
 
