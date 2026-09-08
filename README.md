@@ -1,14 +1,15 @@
 # SyntaxLab
 
-Interactive learning for developers — learn TOML by writing it.
+Interactive learning for developers and exam candidates — learn by writing and practicing.
 
 Demo: https://dsclca12.github.io/SyntaxLab/
 
-SyntaxLab is a small, static learning workspace where you read a concept, edit real TOML, make mistakes, and get useful feedback. It runs entirely in the browser; progress is stored in localStorage.
+SyntaxLab is a small, static learning workspace where you read a concept, edit examples, make mistakes, and get useful feedback. It runs entirely in the browser; progress is stored in localStorage.
 
 ## Features
 
 - 15 short TOML lessons, from key/value pairs to `pyproject.toml`
+- 7 introductory Computer Level 2 lessons covering public foundations, Word, Excel, PowerPoint, Python, and review habits
 - Real TOML parsing and semantic exercise checks
 - Complete, repair, and write-from-requirement exercises
 - Progressive hints after failed attempts
@@ -20,6 +21,7 @@ SyntaxLab is a small, static learning workspace where you read a concept, edit r
 ## Currently supported
 
 - [x] TOML fundamentals
+- [x] Computer Level 2 introduction
 - [x] Interactive exercises
 - [x] TOML validation
 - [x] Local progress
@@ -46,7 +48,7 @@ npm run build
 
 ## Architecture
 
-The application consumes a `LearningModule` made of lessons and exercises. TOML lives under `src/languages/toml`; parsing is provided through the core validator boundary, and the UI does not contain TOML-specific lesson logic. A future module adds its content, config and validator adapter, then registers the module.
+The application consumes a `LearningModule` made of lessons and exercises. TOML lives under `src/languages/toml`; Computer Level 2 content lives under `src/languages/computer`. TOML exercises use the parser, while the exam-introduction exercises use a text validator. A future module should add its content, config and validator/editor choice, then register the module in `src/App.tsx`.
 
 ## Contributing
 

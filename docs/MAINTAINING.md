@@ -21,6 +21,7 @@ npm run dev
 src/
 ├── core/                    # 共享类型、校验和状态逻辑
 ├── languages/toml/          # TOML 课程、练习和中文内容
+├── languages/computer/      # 计算机二级入门课程、练习和中文内容
 ├── App.tsx                  # 工作区布局和状态组合
 └── styles.css               # 全局视觉和响应式样式
 .github/workflows/deploy.yml # GitHub Pages 自动部署
@@ -123,7 +124,7 @@ npm run build
 
 涉及 Vite、React、TypeScript、CodeMirror 或 TOML parser 的大版本升级时，应单独开 PR，并手动走一遍课程和练习。
 
-课程英文内容位于 src/languages/toml/config.ts，中文内容位于 src/languages/toml/i18n.ts。新增或修改英文练习时，应同步维护中文标题、题目、提示和章节正文。练习验证应比较解析后的结构，而不是直接比较字符串。
+课程英文内容位于各模块的 config.ts，中文内容位于对应的 i18n.ts。新增或修改练习时，应同步维护中文标题、题目、提示和章节正文。TOML 练习验证应比较解析后的结构；文字型模块可以使用规范化后的文本验证，但要保证答案不依赖多余空格。
 
 学习进度只保存在浏览器 localStorage 中。修改进度字段时，要提供默认值，避免旧用户打开网站时报错。
 
