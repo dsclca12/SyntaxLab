@@ -10,10 +10,11 @@ SyntaxLab is a small, static learning workspace where you read a concept, edit e
 
 - 15 short TOML lessons, from key/value pairs to `pyproject.toml`
 - 7 introductory Computer Level 2 lessons covering public foundations, Word, Excel, PowerPoint, Python, and review habits
-- A standalone 6-lesson Python Level 2 path, starting with installation, PATH verification, and the first runnable `.py` file
+- A standalone 10-lesson Python fundamentals path, with goals, worked examples, line-by-line walkthroughs, boundary checks, and a complete input-processing exercise
 - Real TOML parsing and semantic exercise checks
 - Complete, repair, and write-from-requirement exercises
 - Progressive hints after failed attempts
+- Python examples include guided tracing and hands-on checkpoints, not only syntax matching
 - Local progress tracking with reset support
 - Responsive three-panel desktop layout and mobile lesson navigation
 - Light and dark themes
@@ -23,14 +24,14 @@ SyntaxLab is a small, static learning workspace where you read a concept, edit e
 
 - [x] TOML fundamentals
 - [x] Computer Level 2 introduction
-- [x] Python Level 2 path from environment setup to exam review
+- [x] Python fundamentals path from the first script to a small integrated problem
 - [x] Interactive exercises
 - [x] TOML validation
 - [x] Local progress
 - [ ] YAML
 - [ ] Markdown
 - [ ] C
-- [ ] Python
+- [x] Python syntax highlighting and structural exercise checks (browser-only)
 
 ## Local development
 
@@ -50,7 +51,7 @@ npm run build
 
 ## Architecture
 
-The application consumes a `LearningModule` made of lessons and exercises. TOML lives under `src/languages/toml`; Computer Level 2 content lives under `src/languages/computer`. TOML exercises use the parser, while the exam-introduction exercises use a text validator. A future module should add its content, config and validator/editor choice, then register the module in `src/App.tsx`.
+The application consumes a `LearningModule` made of lessons and exercises. TOML lives under `src/languages/toml`; Computer Level 2 content lives under `src/languages/computer`; Python fundamentals lives under `src/languages/python`. TOML exercises use the parser, while the text-based learning paths use focused structural validators and syntax-highlighted editors. A future module should add its content, config and validator/editor choice, then register the module in `src/App.tsx`.
 
 ## Contributing
 
