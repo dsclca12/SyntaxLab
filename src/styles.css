@@ -171,6 +171,41 @@ html { scrollbar-width: thin; scrollbar-color: #454d58 #15191f; }
   .check-button, .clear-button { min-height: 36px; }
 }
 
+/* The answer workspace can be collapsed in every layout without losing its state. */
+.practice-toggle { display: grid; place-items: center; border: 1px solid var(--line); border-radius: 4px; background: var(--surface-2); color: var(--muted); padding: 6px; }
+.practice-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.practice-title { min-width: 0; }
+.practice-collapsed .practice-panel { overflow: hidden; }
+.practice-collapsed .practice-title, .practice-collapsed .practice-icon, .practice-collapsed .refresh-button, .practice-collapsed .practice-note, .practice-collapsed .practice-scroll { display: none; }
+.practice-collapsed .practice-panel .practice-head { margin: 0; align-items: center; justify-content: center; }
+.practice-collapsed .practice-tools { gap: 0; }
+
+@media (min-width: 1051px) {
+  .app-shell.practice-collapsed .layout { grid-template-columns: 256px minmax(390px, 1fr) 58px; }
+  .app-shell.sidebar-collapsed.practice-collapsed .layout { grid-template-columns: 68px minmax(390px, 1fr) 58px; }
+  .practice-collapsed .practice-panel { padding: 16px 8px; }
+  .practice-collapsed .practice-head { position: static; padding: 0; }
+}
+
+@media (min-width: 800px) and (max-width: 1050px) {
+  .app-shell.practice-collapsed .layout { grid-template-columns: 190px minmax(300px, 1fr) 58px; }
+  .app-shell.sidebar-collapsed.practice-collapsed .layout { grid-template-columns: 68px minmax(300px, 1fr) 58px; }
+  .practice-collapsed .practice-panel { grid-column: 3; padding: 16px 8px; border-left: 1px solid var(--line); border-top: 0; }
+  .practice-collapsed .practice-head { position: static; padding: 0; }
+}
+
+@media (max-width: 799px) and (min-width: 721px) {
+  .app-shell.practice-collapsed .layout { grid-template-columns: 220px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 58px; }
+  .app-shell.sidebar-collapsed.practice-collapsed .layout { grid-template-columns: 68px minmax(0, 1fr); }
+  .practice-collapsed .practice-panel { grid-column: 2; grid-row: 2; padding: 8px 16px; }
+  .practice-collapsed .practice-head { position: static; padding: 0; }
+}
+
+@media (max-width: 720px) {
+  .practice-collapsed .practice-panel { padding: 0 20px; min-height: 56px; max-height: 56px; }
+  .practice-collapsed .practice-head { min-height: 56px; }
+}
+
 /* Full-length source lessons keep their original hierarchy instead of being compressed into cards. */
 .markdown-content { color: var(--muted); font-size: 14px; line-height: 1.8; }
 .markdown-content h2, .markdown-content h3, .markdown-content h4 { color: var(--ink); margin: 42px 0 12px; line-height: 1.3; }
