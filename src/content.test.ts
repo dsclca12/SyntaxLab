@@ -6,6 +6,8 @@ import { tomlModule } from './languages/toml/config'
 import { tomlChinese } from './languages/toml/i18n'
 import { binaryModule } from './languages/binary/config'
 import { hexadecimalModule } from './languages/hexadecimal/config'
+import { markdownModule } from './languages/markdown/config'
+import { yamlModule } from './languages/yaml/config'
 
 describe('learning content contracts', () => {
   it('keeps TOML examples annotated and exercises intentionally small', () => {
@@ -36,7 +38,7 @@ describe('learning content contracts', () => {
   })
 
   it('accepts every configured text or Python solution', () => {
-    for (const module of [computerModule, pythonModule]) {
+    for (const module of [computerModule, pythonModule, markdownModule, yamlModule]) {
       for (const lesson of module.lessons) {
         for (const exercise of lesson.exercises) {
           expect(exercise.validate(exercise.solution, exercise.solution), exercise.id).toBe(true)

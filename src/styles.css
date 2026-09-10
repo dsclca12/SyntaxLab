@@ -159,6 +159,18 @@ html { scrollbar-width: thin; scrollbar-color: #454d58 #15191f; }
 .resource-list span { color: var(--muted); font-size: 11px; line-height: 1.5; }
 @media (max-width: 720px) { .walkthrough-step { grid-template-columns: 1fr; gap: 5px; } }
 
+/* Editors remain usable on narrow touch screens without forcing horizontal overflow. */
+.exercise-editor { max-width: 100%; }
+.exercise-editor .cm-scroller { overscroll-behavior-x: contain; }
+@media (max-width: 720px) {
+  .exercise-body { padding: 12px; }
+  .exercise-editor { font-size: 11px; }
+  .exercise-editor .cm-content { padding-left: 8px; }
+  .exercise-editor .cm-gutters { min-width: 28px; }
+  .exercise-actions { flex-wrap: wrap; }
+  .check-button, .clear-button { min-height: 36px; }
+}
+
 /* Full-length source lessons keep their original hierarchy instead of being compressed into cards. */
 .markdown-content { color: var(--muted); font-size: 14px; line-height: 1.8; }
 .markdown-content h2, .markdown-content h3, .markdown-content h4 { color: var(--ink); margin: 42px 0 12px; line-height: 1.3; }

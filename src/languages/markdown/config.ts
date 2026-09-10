@@ -1,0 +1,10 @@
+import type { Exercise, LearningModule } from '../../core/types'
+
+const exercise = (id: string, title: string, prompt: string, starter: string, solution: string, rule: (source: string) => boolean): Exercise => ({ id: `markdown-${id}`, kind: 'create', title, prompt, starter, solution, hints: ['Use # for a heading.', 'Use backticks for inline code.', 'Preview the structure before checking.'], validate: (_value, source) => rule(source) })
+const lessons = [
+  { id: 'headings', number: '01', title: '标题与段落', eyebrow: 'BASICS', summary: '用 Markdown 组织可扫描的文档。', sections: [{ heading: '标题表达层级', body: '一个 # 是一级标题，更多 # 表示更深层级。普通文字写成段落。' }], example: '# SyntaxLab\n\nLearn by writing.', exercises: [exercise('headings-1', '写一段文档', '写一个一级标题 SyntaxLab，并包含一段文字。', '', '# SyntaxLab\n\nLearn by writing.', (source) => /^#\s+SyntaxLab/m.test(source) && source.split(/\n\s*\n/).length > 1)] },
+  { id: 'emphasis', number: '02', title: '强调与代码', eyebrow: 'INLINE', summary: '让关键术语和代码清楚可读。', sections: [{ heading: '少量强调', body: '用 **加粗** 标记重点，用反引号包住短代码。' }], example: '**Important**: use `npm test`.', exercises: [exercise('emphasis-1', '标记命令', '写出包含加粗 Important 和行内代码 npm test 的句子。', '', '**Important**: use `npm test`.', (source) => /\*\*Important\*\*/.test(source) && /`npm test`/.test(source))] },
+  { id: 'lists', number: '03', title: '列表与结构', eyebrow: 'PRACTICE', summary: '把步骤和要点变成易读的列表。', sections: [{ heading: '列表适合行动', body: '无序列表使用 -，有序列表使用数字和句点。' }], example: '1. Install\n2. Run\n3. Learn', exercises: [exercise('lists-1', '写三个步骤', '写一个包含 Install、Run、Learn 的有序列表。', '', '1. Install\n2. Run\n3. Learn', (source) => /^\s*1\.\s+Install/m.test(source) && /^\s*2\.\s+Run/m.test(source) && /^\s*3\.\s+Learn/m.test(source))] },
+].map((lesson) => ({ ...lesson, goals: ['使用常见 Markdown 结构', '为读者建立清晰层级'], checkpoints: ['把一段散文改成标题加列表。'], resources: [], note: 'Markdown 的价值在结构；不要为了装饰堆叠格式。' }))
+
+export const markdownModule: LearningModule = { id: 'markdown', name: 'Markdown', description: 'Write structured documents.', lessons, available: true, language: 'Markdown', editor: 'text', practiceRequired: true }
