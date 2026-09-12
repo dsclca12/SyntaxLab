@@ -8,9 +8,9 @@ describe('TOML validator', () => {
   it('rejects extra keys instead of accepting a partial object', () => expect(matchesObject(parseToml('port=8080\nhost="localhost"').data, { port: 8080 })).toBe(false))
   it('compares parsed dates with their stable ISO form', () => expect(matchesObject(parseToml('published = 1979-05-27T07:32:00Z').data, { published: '1979-05-27T07:32:00.000Z' })).toBe(true))
   it('rejects empty input', () => expect(parseToml('').valid).toBe(false))
-  it('rejects duplicate keys and mixed array types', () => {
+  it('rejects duplicate keys and accepts TOML arrays with mixed types', () => {
     expect(parseToml('name = "a"\nname = "b"').valid).toBe(false)
-    expect(parseToml('values = [1, "two"]').valid).toBe(false)
+    expect(parseToml('values = [1, "two"]').data).toEqual({ values: [1, 'two'] })
   })
 })
 

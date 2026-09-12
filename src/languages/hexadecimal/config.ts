@@ -1,23 +1,25 @@
 import type { Exercise, LearningModule, WalkthroughStep } from '../../core/types'
 import hexadecimalSource from './source.md?raw'
 
-const compact = (source: string) => source.toLowerCase().replace(/\s+/g, '').replace(/[，。；：、]/g, '')
 const randomInt = (seed: number, min: number, max: number) => {
   const raw = Math.sin(seed * 12.9898 + 78.233) * 43758.5453
   return Math.floor((raw - Math.floor(raw)) * (max - min + 1)) + min
 }
 const hex = (value: number) => value.toString(16).toUpperCase()
 const binary = (value: number) => value.toString(2)
-const decimalAnswer = (value: number, source: string) => compact(source).replace(/₁₀|10进制|十进制/g, '').includes(String(value))
+const decimalAnswer = (value: number, source: string) => {
+  const normalized = source.toLowerCase().replace(/\s+/g, '').replace(/₁₀|10进制|十进制/g, '').replace(/[＝]/g, '=')
+  return new RegExp(`(?:^|[^0-9a-z_.-])${value}(?:bit)?(?![0-9a-z_.])`, 'i').test(normalized)
+}
 const hexAnswer = (value: number, source: string) => {
   const expected = hex(value).toLowerCase().replace(/^0+/, '') || '0'
-  const cleaned = (compact(source).replace(/^0x/, '').replace(/₁₆|16进制|十六进制/g, '').replace(/^0+/, '') || '0')
-  return cleaned === expected || cleaned === `=${expected}`
+  const normalized = source.toLowerCase().replace(/\s+/g, '').replace(/[＝]/g, '=')
+  return new RegExp(`(?:^|=)(?:0x)?0*${expected}(?:₁₆|16进制|十六进制)?(?:$|[^0-9a-z])`, 'i').test(normalized)
 }
 const binaryAnswer = (value: number, source: string) => {
   const expected = binary(value)
-  const cleaned = compact(source).replace(/^0b/, '').replace(/₂|二进制/g, '')
-  return cleaned === expected || cleaned === `=${expected}`
+  const normalized = source.toLowerCase().replace(/\s+/g, '').replace(/[＝]/g, '=')
+  return new RegExp(`(?:^|=)(?:0b)?0*${expected}(?:₂|二进制)?(?:$|[^0-9a-z])`, 'i').test(normalized)
 }
 const answer = (id: string, title: string, prompt: string, starter: string, solution: string, hints: string[], validate: (source: string) => boolean, feedback: string): Exercise => ({
   id,

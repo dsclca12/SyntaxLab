@@ -3,11 +3,14 @@ import binarySource from './source.md?raw'
 
 const binary = (value: number) => value.toString(2)
 const compact = (source: string) => source.toLowerCase().replace(/\s+/g, '').replace(/[，。；：、]/g, '')
-const numberAnswer = (value: number, source: string) => compact(source).replace(/₁₀|10进制|十进制/g, '').includes(String(value))
+const numberAnswer = (value: number, source: string) => {
+  const normalized = source.toLowerCase().replace(/\s+/g, '').replace(/₁₀|10进制|十进制/g, '').replace(/[＝]/g, '=')
+  return new RegExp(`(?:^|[^0-9a-z_.-])${value}(?:bit)?(?![0-9a-z_.])`, 'i').test(normalized)
+}
 const binaryAnswer = (value: number, source: string) => {
   const expected = binary(value)
-  const cleaned = compact(source).replace(/^0b/, '').replace(/₂|二进制/g, '')
-  return cleaned === expected || cleaned === `=${expected}`
+  const normalized = source.toLowerCase().replace(/\s+/g, '').replace(/[＝]/g, '=')
+  return new RegExp(`(?:^|=)(?:0b)?0*${expected}(?:₂|二进制)?(?:$|[^0-9a-z])`, 'i').test(normalized)
 }
 const randomInt = (seed: number, min: number, max: number) => {
   const raw = Math.sin(seed * 12.9898 + 78.233) * 43758.5453

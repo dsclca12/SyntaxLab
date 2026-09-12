@@ -38,6 +38,8 @@ SyntaxLab is a small, static learning workspace where you read a concept, edit e
 
 ## Local development
 
+Requires Node.js 20 or later.
+
 ```bash
 npm install
 npm run dev

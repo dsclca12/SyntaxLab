@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createHexadecimalExercises } from './config'
 
 const lessonIds = ['overview', 'mapping', 'place-value', 'bytes', 'notation']
+const answerInEditor = (starter: string, solution: string) => `${starter}${starter.trimEnd().match(/0[bx]$/i) ? solution.replace(/^0[bx]/i, '') : solution}`
 
 describe('hexadecimal exercise generator', () => {
   it('generates answerable exercises for every lesson and seed', () => {
@@ -11,6 +12,7 @@ describe('hexadecimal exercise generator', () => {
         expect(exercises.length, `${lessonId}-${seed}`).toBeGreaterThan(0)
         for (const exercise of exercises) {
           expect(exercise.validate(exercise.solution, exercise.solution), exercise.id).toBe(true)
+          expect(exercise.validate(exercise.solution, answerInEditor(exercise.starter, exercise.solution)), `${exercise.id} accepts an answer typed after its starter`).toBe(true)
         }
       }
     }
