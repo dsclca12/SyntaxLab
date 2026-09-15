@@ -2,6 +2,18 @@ import type { Exercise, LearningModule, ResourceLink } from '../../core/types'
 
 type Rule = (source: string) => boolean
 
+// 将短课按学习目标分组：读者先知道当前在解决哪一类问题，再进入一个具体语法点。
+const pythonLessonChapters: Record<string, string> = {
+  start: '第 1 章 · 开始运行 Python', environment: '第 1 章 · 开始运行 Python',
+  values: '第 2 章 · 值、变量与文本', strings: '第 2 章 · 值、变量与文本', operators: '第 2 章 · 值、变量与文本', 'number-format': '第 2 章 · 值、变量与文本', 'string-tools': '第 2 章 · 值、变量与文本',
+  conditions: '第 3 章 · 条件与控制流', 'boolean-branches': '第 3 章 · 条件与控制流', 'match-case': '第 3 章 · 条件与控制流',
+  loops: '第 4 章 · 循环与遍历', 'range-loop': '第 4 章 · 循环与遍历', 'while-control': '第 4 章 · 循环与遍历', 'iteration-tools': '第 4 章 · 循环与遍历',
+  collections: '第 5 章 · 容器与数据组织', 'list-methods': '第 5 章 · 容器与数据组织', 'tuples-sets': '第 5 章 · 容器与数据组织', 'dict-basics': '第 5 章 · 容器与数据组织', 'dict-loop': '第 5 章 · 容器与数据组织', comprehensions: '第 5 章 · 容器与数据组织',
+  functions: '第 6 章 · 函数与程序结构', 'function-returns': '第 6 章 · 函数与程序结构', 'scope-defaults': '第 6 章 · 函数与程序结构',
+  files: '第 7 章 · 文件、异常与模块', 'exceptions-detail': '第 7 章 · 文件、异常与模块', modules: '第 7 章 · 文件、异常与模块', 'json-paths': '第 7 章 · 文件、异常与模块',
+  classes: '第 8 章 · 面向对象与实践', 'testing-debugging': '第 8 章 · 面向对象与实践', algorithm: '第 8 章 · 面向对象与实践', 'mini-project': '第 8 章 · 面向对象与实践',
+}
+
 const compact = (source: string) => source.trim().replace(/\r/g, '').split('\n').map((line) => line.trimEnd()).join('\n')
 const has = (...patterns: RegExp[]): Rule => (source) => patterns.every((pattern) => pattern.test(source))
 const exactOr = (solution: string, alternatives: string[] = []): Rule => (source) => [solution, ...alternatives].some((answer) => compact(source) === compact(answer))
@@ -46,7 +58,7 @@ const lesson = (
     { heading: '常见误区', body: lecture.misconception },
     { heading: '无 AI 验收标准', body: lecture.acceptance },
   ] : []
-  return { id, number, title, eyebrow: 'PYTHON 入门路径', summary, sections: [...sections, ...(zeroBaseGuides[id] ?? []), ...lectureSections], example, goals, exercises, note, walkthrough: detail.walkthrough, checkpoints: detail.checkpoints, resources: detail.resources }
+  return { id, number, title, eyebrow: 'PYTHON 入门路径', summary, chapter: pythonLessonChapters[id], sections: [...sections, ...(zeroBaseGuides[id] ?? []), ...lectureSections], example, goals, exercises, note, walkthrough: detail.walkthrough, checkpoints: detail.checkpoints, resources: detail.resources }
 }
 
 // 每个示例都配一份“读代码路线”。初学者最容易卡住的不是记不住关键字，
@@ -297,7 +309,7 @@ python -m pip --version
       ex('strings-1', '补全切片', '取出 text 的前 3 个字符。', 'text[', 'text[:3]', ['切片左边空着表示从头开始。', '结束位置写 3。', '切片不包含下标 3。']),
       ex('strings-2', '清理用户输入', '把 name 两端的空格去掉，并把结果保存回 name。', 'name = name.', 'name = name.strip()', ['去两端空白的方法是 strip。', '方法需要括号。', '要重新赋值，清理结果才会保存。'], has(/name\s*=\s*name\.strip\s*\(\s*\)/), 'strip() 返回清理后的新字符串，不会自动改变原变量。'),
     ]),
-    lesson('conditions', '05', '条件、比较与布尔逻辑', '把“如果……那么……”翻译成清楚、可检查的代码。', [
+    lesson('conditions', '08', '条件、比较与布尔逻辑', '把“如果……那么……”翻译成清楚、可检查的代码。', [
       { heading: '条件是一条问题', body: 'if 后面必须是能得到 True 或 False 的表达式，并以冒号结束。常见比较符号有 ==、!=、>、>=、<、<=。代码块由缩进决定，建议始终使用 4 个空格。' },
       { heading: '组合条件', body: 'and 要求两边都为真，or 只要一边为真，not 会反转真假。复杂条件可以加括号。先用自然语言说清楚，再写代码，能显著减少“看起来差不多”的逻辑错误。' },
       { heading: '分支要覆盖边界', body: '判断分数时要考虑刚好及格、刚好不及格；判断范围时要确认端点是否包含。elif 按顺序检查，前面条件已经成立后，后面的分支不会再执行。' },
@@ -305,7 +317,7 @@ python -m pip --version
       ex('conditions-1', '补全及格条件', '60 分也算及格，补全 if 条件。', 'if score ', 'if score >= 60:', ['“包含 60”意味着要带等号。', '大于等于写作 >=。', '条件行末尾要有冒号。'], has(/if\s+score\s*>=\s*60\s*:/), '边界值 60 是测试条件的好例子：先写规则，再用 59、60、61 验证。'),
       ex('conditions-2', '修复登录判断', '只有用户名和密码都正确时才输出登录成功。', 'if user == "admin" or password == "1234":\n    print("登录成功")', 'if user == "admin" and password == "1234":\n    print("登录成功")', ['两个条件必须同时成立。', '同时成立使用 and。', '保留两个比较和缩进。'], has(/if\s+user\s*==\s*["']admin["']\s+and\s+password\s*==\s*["']1234["']\s*:/), 'or 会让“只对一个条件”也通过；权限判断通常需要 and。'),
     ]),
-    lesson('loops', '06', '循环与循环不变量', '让重复工作可控，学会追踪每一轮的变量变化。', [
+    lesson('loops', '11', '循环与循环不变量', '让重复工作可控，学会追踪每一轮的变量变化。', [
       { heading: 'for 适合遍历', body: 'for item in items 会依次取出每个元素。range(start, stop, step) 生成整数序列，stop 永远不包含在内；range(1, 4) 是 1、2、3。' },
       { heading: 'while 要有出口', body: 'while 在条件为真时反复执行。循环体里必须有某件事让条件最终变假，否则程序会无限循环。写 while 前先想好：初值是什么、每轮怎么变、什么时候停。' },
       { heading: '累加器是小型算法', body: 'total = 0 是累加器的初始状态，每轮用 total += number 更新。手算循环时做一张表，记录轮次、当前元素和 total，比凭感觉猜输出可靠。' },
@@ -313,7 +325,7 @@ python -m pip --version
       ex('loops-1', '补全遍历范围', '打印 1、2、3，补全 range。', 'for number in range(', 'for number in range(1, 4):\n    print(number)', ['range 的结束值不包含。', '要包含 3，结束值写 4。', '循环体需要缩进并打印 number。'], has(/for\s+number\s+in\s+range\s*\(\s*1\s*,\s*4\s*\)\s*:/, /print\s*\(\s*number\s*\)/), '把“包含 1 到 3”翻译成 range(1, 4)，这是边界思维的基本训练。'),
       ex('loops-2', '修复 while 出口', '修复循环变量没有变化的问题，让程序输出 0、1、2 后停止。', 'i = 0\nwhile i < 3:\n    print(i)', 'i = 0\nwhile i < 3:\n    print(i)\n    i += 1', ['条件依赖 i。', '每轮输出后让 i 增加。', '使用 i += 1。'], has(/while\s+i\s*<\s*3\s*:/, /print\s*\(\s*i\s*\)/, /i\s*\+=\s*1/), '检查 while 时必须同时找“条件”和“改变条件的语句”。'),
     ]),
-    lesson('collections', '07', '列表、字典与可变数据', '选择合适的数据结构，并能安全地遍历和更新它们。', [
+    lesson('collections', '15', '列表、字典与可变数据', '选择合适的数据结构，并能安全地遍历和更新它们。', [
       { heading: '列表保存有顺序的数据', body: '列表可以放多个值，索引从 0 开始。append(value) 在末尾添加，len(items) 获取长度，for item in items 遍历全部元素。不要把“第几个”误当成“下标几”。' },
       { heading: '字典保存对应关系', body: '字典用 key 找 value，例如 student["score"]。键应该稳定且有意义；遍历键值对用 for key, value in data.items()。访问不确定存在的键时，可以考虑 get。' },
       { heading: '原地修改与重新绑定', body: 'items.append(4) 会修改列表本身；items = items + [4] 会创建新列表并重新绑定。学习阶段先选择更直观的写法，调试时明确每一步数据长什么样。' },
@@ -321,7 +333,7 @@ python -m pip --version
       ex('collections-1', '补全列表访问', '取出 names 的最后一个元素。', 'names[', 'names[-1]', ['最后一个元素可以用负索引。', '负索引从 -1 开始。', '补上右方括号。']),
       ex('collections-2', '修复字典访问', '修复读取 student 中 score 的语句。', 'print(student.score)', 'print(student["score"])', ['字典不是对象属性访问。', '用方括号写键。', 'score 是字符串键。'], has(/print\s*\(\s*student\s*\[\s*["']score["']\s*\]\s*\)/), '点号适合对象属性；字典的键值访问使用方括号。'),
     ]),
-    lesson('functions', '08', '函数：拆分问题与返回结果', '把重复逻辑封装成可测试、可复用的小部件。', [
+    lesson('functions', '21', '函数：拆分问题与返回结果', '把重复逻辑封装成可测试、可复用的小部件。', [
       { heading: '函数有输入和输出', body: 'def 定义函数，参数是调用者提供的输入，return 是函数交还的结果。return 会立即结束函数；没有 return 时，函数默认返回 None。不要把 print 的展示误当成 return 的结果。' },
       { heading: '局部变量与参数', body: '函数内部创建的局部变量通常只在函数内部使用。参数名可以和外部变量名不同；调用时把实际值传入。每个函数尽量只负责一件事，名字用动词或清晰的动作描述。' },
       { heading: '先写例子再抽象', body: '遇到长题目时，先用一个具体输入手算正确结果，再找出重复步骤，最后提取成函数。函数不是为了显得高级，而是为了让每一部分都能单独验证。' },
@@ -329,7 +341,7 @@ python -m pip --version
       ex('functions-1', '补全返回值', '定义 add(a, b)，返回两个参数的和。', 'def add(a, b):\n', 'def add(a, b):\n    return a + b', ['函数体需要缩进。', '返回语句是 return。', '返回 a + b。'], has(/def\s+add\s*\(\s*a\s*,\s*b\s*\)\s*:/, /return\s+a\s*\+\s*b/), 'return 让调用者拿到结果，所以 result = add(2, 3) 可以继续参与计算。'),
       ex('functions-2', '修复函数调用', '调用 greet 函数，并把返回值保存到 message。', 'message = greet', 'message = greet("Ada")', ['调用函数需要括号。', '把 Ada 作为字符串参数。', '保存调用结果到 message。'], has(/message\s*=\s*greet\s*\(\s*["']Ada["']\s*\)/), '写函数名不等于调用函数；括号表示现在传入参数并执行。'),
     ]),
-    lesson('files', '09', '文件、异常与资源管理', '让程序能读取真实数据，并面对输入不理想的情况。', [
+    lesson('files', '24', '文件、异常与资源管理', '让程序能读取真实数据，并面对输入不理想的情况。', [
       { heading: '用 with 管理文件', body: 'with open("notes.txt", encoding="utf-8") as file: 会在代码块结束时自动关闭文件。读取文本常用 read、readline 或 for line in file；写入时要明确 w 会覆盖原内容，a 会追加到末尾。' },
       { heading: '异常是可预期的分支', body: '用户输入非数字、文件不存在都可能发生。try 放可能失败的代码，except 捕获特定异常并给出可理解的处理。不要用裸 except 吞掉所有错误，那会让真正的 bug 消失。' },
       { heading: '先判断能否恢复', body: '如果输入错误可以重新提示，就捕获 ValueError；如果文件不存在，可以提示路径或使用默认内容。异常处理的目标不是让所有错误都安静，而是让可预期的问题有清晰出口。' },
@@ -337,7 +349,7 @@ python -m pip --version
       ex('files-1', '修复文件模式', '以追加模式打开 log.txt。', 'with open("log.txt", "w") as file:', 'with open("log.txt", "a") as file:', ['w 会覆盖旧内容。', '追加模式是 a。', '保留 with 和 as file 的结构。'], has(/with\s+open\s*\(\s*["']log\.txt["']\s*,\s*["']a["']\s*\)\s+as\s+file\s*:/), '涉及日志时通常不希望每次运行都抹掉历史，先判断需求再选模式。'),
       ex('files-2', '补全安全读取', '使用 with 读取 data.txt 的全部内容，并保存到 content。', 'with open("data.txt", encoding="utf-8") as file:\n', 'with open("data.txt", encoding="utf-8") as file:\n    content = file.read()', ['文件代码块要缩进。', '读取全部内容的方法是 read。', '把结果保存到 content。'], has(/with\s+open\s*\(\s*["']data\.txt["']\s*,\s*encoding\s*=\s*["']utf-8["']\s*\)\s+as\s+file\s*:/, /content\s*=\s*file\.read\s*\(\s*\)/), 'with 同时表达“打开、使用、自动关闭”，比手动 close 更不容易漏资源。'),
     ]),
-    lesson('modules', '10', '模块、标准库与可读性', '学会复用已有能力，而不是把所有代码堆在一个文件里。', [
+    lesson('modules', '26', '模块、标准库与可读性', '学会复用已有能力，而不是把所有代码堆在一个文件里。', [
       { heading: 'import 是依赖声明', body: 'import math 后通过 math.sqrt(9) 使用模块里的函数；from random import randint 则直接引入名字。导入通常放在文件顶部，便于读者知道程序依赖什么。' },
       { heading: '标准库解决常见问题', body: 'datetime 处理日期，pathlib 处理路径，json 处理结构化文本，statistics 做基础统计。先看模块提供的能力，再决定是否自己造轮子；考试题中也常要求辨认导入和调用关系。' },
       { heading: '可读性是正确性的一部分', body: '使用有意义的变量名，函数保持短小，重复逻辑集中管理。注释应该解释原因或约束，而不是把每一行翻译成中文。能让未来的自己快速复查，就是好的代码。' },
@@ -345,7 +357,7 @@ python -m pip --version
       ex('modules-1', '补全模块调用', '导入 math，并计算 16 的平方根。', 'import math\nprint(', 'import math\nprint(math.sqrt(16))', ['模块名是 math。', '平方根函数是 sqrt。', '调用时要写 math.sqrt。'], has(/import\s+math/, /print\s*\(\s*math\.sqrt\s*\(\s*16\s*\)\s*\)/), 'math.sqrt(16) 说明“函数属于哪个模块”，点号不要省略。'),
       ex('modules-2', '修复导入方式', '修复导入 randint 的语句。', 'import random.randint', 'from random import randint', ['from ... import ... 是直接导入名字的写法。', '模块名是 random。', '被导入的函数是 randint。'], has(/from\s+random\s+import\s+randint/), '两种 import 写法都能复用能力，但调用形式不同：random.randint(...) 或 randint(...)。'),
     ]),
-    lesson('algorithm', '11', '综合题：把需求变成程序', '用“输入—处理—输出—测试”完成一个小型真实任务。', [
+    lesson('algorithm', '29', '综合题：把需求变成程序', '用“输入—处理—输出—测试”完成一个小型真实任务。', [
       { heading: '先写数据流', body: '拿到题目不要立刻敲代码。先写输入是什么、输出是什么、中间需要哪些变量；再用一个最小样例手算。这样能把“不会写”拆成几个可验证的小问题。' },
       { heading: '拆出规则和边界', body: '把自然语言中的“至少、超过、不足、每个、所有”圈出来，它们往往对应 >=、>、循环和列表。再补测 0、1、刚好达到阈值、空列表等边界。' },
       { heading: '复盘不只看对错', body: '完成后记录：这题的核心模式、第一次错在哪里、哪个测试暴露了问题、下次看到什么关键词可以联想到这个模式。复盘记录比抄一份标准答案更能迁移。' },
@@ -354,5 +366,185 @@ python -m pip --version
       ex('algorithm-2', '修复边界判断', '只有列表非空时才计算平均值，修复可能除以 0 的代码。', 'average = sum(scores) / len(scores)\nprint(average)', 'if scores:\n    average = sum(scores) / len(scores)\n    print(average)', ['空列表在条件中会被当成 False。', '把计算放进 if 代码块。', '两行代码都要缩进。'], has(/if\s+scores\s*:/, /average\s*=\s*sum\s*\(\s*scores\s*\)\s*\/\s*len\s*\(\s*scores\s*\)/, /print\s*\(\s*average\s*\)/), '先处理空输入，再做除法，是把“边界测试”落实到代码里的典型方式。'),
       ex('algorithm-3', '完成成绩分析', '写程序读取若干整数成绩，输出及格人数和及格成绩平均分；没有及格成绩时只输出 0。', '', 'scores = [int(value) for value in input().split()]\npassed = [score for score in scores if score >= 60]\nprint(len(passed))\nif passed:\n    print(sum(passed) / len(passed))', ['先解析一行整数。', '用条件筛出大于等于 60 的成绩。', '先输出人数，非空时再算平均分。'], has(/scores\s*=\s*\[\s*int\s*\(\s*value\s*\)\s+for\s+value\s+in\s+input\s*\(\s*\)\.split\s*\(\s*\)\s*\]/, /passed\s*=\s*\[\s*score\s+for\s+score\s+in\s+scores\s+if\s+score\s*>=\s*60\s*\]/, /print\s*\(\s*len\s*\(\s*passed\s*\)\s*\)/, /if\s+passed\s*:/, /print\s*\(\s*sum\s*\(\s*passed\s*\)\s*\/\s*len\s*\(\s*passed\s*\)\s*\)/), '这道题把输入解析、筛选、计数、平均值和空列表边界串在一起，建议分别测试：空行、59、60、100。'),
     ], '建议节奏：每课先读目标，再不看示例写第一版；提交后把代码复制到本机 Python 运行，最后把一次错误写进自己的复盘记录。'),
-  ],
+    lesson('operators', '05', '运算符：把规则写准确', '一节课讲清算术、比较、逻辑与成员运算，避免“看起来对”的条件。', [
+      { heading: '先区分“计算”与“判断”', body: '算术运算符会产生数值：`+`、`-`、`*`、`/`、`//`、`%`、`**`。比较运算符会产生布尔值：`==`、`!=`、`>`、`>=`、`<`、`<=`。例如 `17 // 5` 的结果是 `3`，`17 % 5` 的结果是 `2`；前者是整除后的商，后者是余数。' },
+      { heading: '真实例子：判断优惠资格', body: '商店规则是“会员或订单满 200 元可免运费，但黑名单用户不可以”。不要把条件挤成一行后凭感觉读；先给每个判断起名字，再组合。`and` 比 `or` 优先执行，因此复杂条件用括号表达意图。\n\n~~~python\nis_member = True\namount = 128\nis_blocked = False\ncan_ship_free = (is_member or amount >= 200) and not is_blocked\nprint(can_ship_free)  # True\n~~~' },
+      { heading: '`in` 是“是否包含”，不是相等', body: '`"py" in "python"` 是 True，因为前者是后者的一部分；`"py" == "python"` 是 False，因为它们不是同一个字符串。对列表、字典也能使用 `in`：对字典检查的是**键**，不是值。' },
+      { heading: '常见误区：`=` 与 `==`', body: '`score = 60` 是把值保存到变量；`score == 60` 是提出“它是否等于 60”这个问题。Python 不允许在 `if` 中误用 `=`，报错时先检查条件行。' },
+    ], 'age = 18\nweekend = True\nprice = 80\n\nif age < 12 or age >= 60:\n    price *= 0.5\nelif weekend:\n    price *= 0.8\n\nprint(f"票价：{price:g} 元")', ['能解释 `/`、`//`、`%` 各自的结果', '能用括号写出可读的复合条件', '知道 `in` 在字典中检查键'], [
+      ex('operators-1', '补全余数判断', '当 number 是偶数时输出“偶数”。', 'if number ', 'if number % 2 == 0:\n    print("偶数")', ['偶数除以 2 的余数是 0。', '余数运算符是 %。', '条件行末尾需要冒号。'], has(/number\s*%\s*2\s*==\s*0/)),
+      ex('operators-2', '写出范围条件', '年龄在 18 到 60（含两端）之间时输出“可报名”。', '', 'if 18 <= age <= 60:\n    print("可报名")', ['Python 可以连续比较。', '两端都包含，所以使用 <=。', '也可写成 age >= 18 and age <= 60。'], has(/18\s*<=\s*age\s*<=\s*60|age\s*>=\s*18\s+and\s+age\s*<=\s*60/)),
+    ]),
+    lesson('tuples-sets', '17', '元组与集合：约束与去重', '当数据不应修改或不应重复时，选对容器比多写判断更重要。', [
+      { heading: '元组：固定的一组值', body: '元组用圆括号表示，例如 `point = (3, 5)`。它适合“坐标、日期、函数返回的多个结果”这类结构固定的数据。元组不能用 `point[0] = 9` 修改；这种限制能提前暴露意外修改。只有一个元素时必须写逗号：`one = (42,)`，否则 `(42)` 只是数字。' },
+      { heading: '集合：不重复、无固定顺序', body: '集合用花括号表示，例如 `{"Python", "Python", "SQL"}` 会自动变成两个元素。它特别适合去重和“是否存在”的快速查询。不要按下标访问集合，也不要依赖它的显示顺序；若需要稳定顺序，使用 `sorted(tags)` 得到新列表。' },
+      { heading: '真实例子：清理报名名单', body: '下面程序保留第一次出现的名字顺序，同时找出重复报名者。这里列表负责顺序，集合负责快速记忆“已经见过”。\n\n~~~python\nnames = ["Ada", "Lin", "Ada", "Mo", "Lin"]\nseen = set()\nunique = []\nduplicates = set()\n\nfor name in names:\n    if name in seen:\n        duplicates.add(name)\n    else:\n        seen.add(name)\n        unique.append(name)\n\nprint(unique)             # [\'Ada\', \'Lin\', \'Mo\']\nprint(sorted(duplicates)) # [\'Ada\', \'Lin\']\n~~~' },
+      { heading: '集合运算读法', body: '`a | b` 是并集（任一集合出现）；`a & b` 是交集（两个都出现）；`a - b` 是差集（只在 a）。用于比较两份权限、两次报名或两份标签时很清楚。' },
+    ], 'coordinate = (12, 8)\nallowed_roles = {"editor", "admin"}\nrole = "editor"\n\nprint(coordinate[0])\nprint(role in allowed_roles)', ['能说明元组为何不可变', '能用集合去重', '能用集合判断成员是否存在'], [
+      ex('tuples-sets-1', '创建单元素元组', '创建只含字符串 Python 的元组 languages。', '', 'languages = ("Python",)', ['单元素元组需要逗号。', '字符串需要引号。', '变量名是 languages。'], has(/languages\s*=\s*\(\s*["']Python["']\s*,\s*\)/)),
+      ex('tuples-sets-2', '对列表去重', '将 items 去重后保存到 unique_items。', '', 'unique_items = set(items)', ['set 可以接收列表。', '结果是集合。', '不要把 set 写成 list。'], has(/unique_items\s*=\s*set\s*\(\s*items\s*\)/)),
+    ]),
+    lesson('iteration-tools', '14', 'enumerate 与 zip：带着位置遍历', '处理“第几个”和“两个列表一一对应”时，不必手动维护下标。', [
+      { heading: '`enumerate` 同时给位置和值', body: '普通 `for name in names` 只拿到值。需要序号时写 `for index, name in enumerate(names, start=1)`；`start=1` 让展示给用户的序号从 1 开始，列表下标仍然从 0 开始。' },
+      { heading: '`zip` 把对应数据配成对', body: '`zip(names, scores)` 每轮取两个序列的同一位置。它会在**最短序列结束时停止**，所以若两个列表必须严格等长，应先检查 `len(names) == len(scores)`。' },
+      { heading: '真实例子：生成成绩单', body: '每个学生和其分数按位置对应；`enumerate` 只负责行号，`zip` 只负责配对。职责分开，读代码时就容易验证。\n\n~~~python\nnames = ["Ada", "Lin", "Mo"]\nscores = [92, 78, 100]\n\nfor line, (name, score) in enumerate(zip(names, scores), start=1):\n    print(f"{line}. {name}: {score}")\n~~~\n\n输出会是 `1. Ada: 92`、`2. Lin: 78`、`3. Mo: 100`。' },
+      { heading: '不要一边遍历一边随意改列表', body: '遍历时删除或插入原列表，容易跳过元素。需要筛选时创建新列表；需要位置和值时用 `enumerate`，不要手动写 `i = i + 1`。' },
+    ], 'tasks = ["安装 Python", "运行脚本", "写函数"]\nfor number, task in enumerate(tasks, start=1):\n    print(f"{number}. {task}")', ['能用 enumerate 展示从 1 开始的序号', '能用 zip 并行遍历两份相关数据', '知道 zip 遇到长度不等时的行为'], [
+      ex('iteration-tools-1', '补全带序号的遍历', '从 1 开始打印每个 name 的序号和名字。', 'for index, name in ', 'for index, name in enumerate(names, start=1):\n    print(index, name)', ['函数名是 enumerate。', '把 names 作为第一个参数。', 'start=1 让显示序号从 1 开始。'], has(/enumerate\s*\(\s*names\s*,\s*start\s*=\s*1\s*\)/)),
+      ex('iteration-tools-2', '配对姓名和分数', '遍历 names 与 scores，每轮得到 name 和 score。', 'for name, score in ', 'for name, score in zip(names, scores):\n    print(name, score)', ['配对函数叫 zip。', '顺序传入 names, scores。', '循环行末尾需要冒号。'], has(/zip\s*\(\s*names\s*,\s*scores\s*\)/)),
+    ]),
+    lesson('comprehensions', '20', '列表推导式：把筛选写紧凑', '先读懂展开版循环，再用推导式表达“遍历、转换、筛选”。', [
+      { heading: '推导式的固定阅读顺序', body: '`[expression for item in items if condition]` 从中间开始读：逐个取 `item`，若满足 `condition`，就把 `expression` 收集起来。最后的 `if` 是筛选，不是 `if/else` 语句块。' },
+      { heading: '从展开版到推导式', body: '下面两段代码结果相同。学习时先写左边，确认正确再压缩成右边。\n\n~~~python\n# 展开版\nsquares = []\nfor number in numbers:\n    if number % 2 == 0:\n        squares.append(number ** 2)\n\n# 推导式\nsquares = [number ** 2 for number in numbers if number % 2 == 0]\n~~~' },
+      { heading: '真实例子：标准化标签', body: '表单输入常含空格和大小写差异。先清理，再丢弃空标签：\n\n~~~python\nraw_tags = [" Python ", "", "WEB", "  data"]\ntags = [tag.strip().lower() for tag in raw_tags if tag.strip()]\nprint(tags)  # [\'python\', \'web\', \'data\']\n~~~\n\n这里 `tag.strip()` 在条件中判断清理后是否非空，在表达式中得到最终值。短小但仍能读懂时才使用推导式。' },
+      { heading: '何时不要写推导式', body: '如果需要多步处理、`try/except`、打印调试信息或嵌套超过一层，展开成普通循环通常更清晰。简短不是目标；能被未来的自己读懂才是。' },
+    ], 'numbers = [1, 2, 3, 4, 5]\neven_squares = [number ** 2 for number in numbers if number % 2 == 0]\nprint(even_squares)  # [4, 16]', ['能按固定顺序读列表推导式', '能把循环和 append 改写为推导式', '知道复杂逻辑应保留展开循环'], [
+      ex('comprehensions-1', '筛选及格分数', '从 scores 创建只含 60 分及以上的 passed 列表。', '', 'passed = [score for score in scores if score >= 60]', ['先写要收集的 score。', '中间写 for score in scores。', '最后用 if score >= 60 筛选。'], has(/passed\s*=\s*\[\s*score\s+for\s+score\s+in\s+scores\s+if\s+score\s*>=\s*60\s*\]/)),
+      ex('comprehensions-2', '转换为小写', '把 words 的每个元素转小写，保存到 lower_words。', '', 'lower_words = [word.lower() for word in words]', ['表达式是 word.lower()。', '逐个遍历 words。', '结果用方括号收集。'], has(/lower_words\s*=\s*\[\s*word\.lower\s*\(\s*\)\s+for\s+word\s+in\s+words\s*\]/)),
+    ]),
+    lesson('scope-defaults', '23', '作用域、默认参数与关键字参数', '让函数调用清楚、可预测，不依赖“刚好存在”的外部变量。', [
+      { heading: '函数优先使用参数和返回值', body: '函数内部的变量是局部变量，离开函数后通常不能访问。与其让函数偷偷读取外部的 `tax_rate`，不如把需要的数据作为参数传入，结果用 return 交还。这样同一个函数能用不同输入测试。' },
+      { heading: '默认参数只适合稳定的默认值', body: '例如 `def greet(name, prefix="你好"):` 允许 `greet("Ada")` 和 `greet("Ada", "欢迎")`。默认值应表达真实的常用情况。**不要**把列表、字典、集合当作默认值，因为它们会在多次调用之间共享。需要可变容器时用 `None` 作为默认值，再在函数内创建。' },
+      { heading: '关键字参数让调用像一句话', body: '`send_message(text="已保存", urgent=True)` 明确每个值的含义，尤其适合多个同类型参数。位置参数必须排在关键字参数前面。' },
+      { heading: '真实例子：安全地积累待办项', body: '每次没有传入列表时，函数都会新建一个，而不是复用上次的列表。\n\n~~~python\ndef add_task(title, tasks=None):\n    if tasks is None:\n        tasks = []\n    tasks.append(title)\n    return tasks\n\nfirst = add_task("学习函数")\nsecond = add_task("写练习")\nprint(first)   # [\'学习函数\']\nprint(second)  # [\'写练习\']\n~~~' },
+    ], 'def format_price(amount, currency="CNY"):\n    return f"{amount:.2f} {currency}"\n\nprint(format_price(19.9))\nprint(format_price(19.9, currency="USD"))', ['能说明局部变量的可见范围', '能设计简单且安全的默认参数', '能读写关键字参数调用'], [
+      ex('scope-defaults-1', '添加默认问候语', '定义 greet(name, prefix="你好")，并返回拼好的文本。', '', 'def greet(name, prefix="你好"):\n    return f"{prefix}，{name}"', ['参数默认值用 = 写在参数列表中。', '函数体需要缩进。', '返回 f-string。'], has(/def\s+greet\s*\(\s*name\s*,\s*prefix\s*=\s*["']你好["']\s*\)\s*:/, /return\s+f["']/)),
+      ex('scope-defaults-2', '避免可变默认值', '当 tasks 没有传入时，在函数中创建空列表。', 'def add_task(title, tasks=None):\n', 'def add_task(title, tasks=None):\n    if tasks is None:\n        tasks = []\n    tasks.append(title)\n    return tasks', ['默认值先使用 None。', '在函数内判断 is None。', '再创建新的 []。'], has(/tasks\s+is\s+None/, /tasks\s*=\s*\[\s*\]/, /tasks\.append\s*\(\s*title\s*\)/)),
+    ]),
+    lesson('json-paths', '27', '路径与 JSON：读写真实数据', '使用 pathlib 和 json 处理文件，不再手写脆弱的路径字符串。', [
+      { heading: 'pathlib 让路径跨平台', body: '`Path("data") / "profile.json"` 会按当前系统组合路径，不需要自己猜 `/` 或 `\\`。先用 `path.exists()` 判断文件是否存在；读取文本时明确 `encoding="utf-8"`，避免中文在不同电脑上乱码。' },
+      { heading: 'JSON 是数据格式，不是 Python 代码', body: 'JSON 对象在 Python 中通常变成字典，JSON 数组变成列表。用 `json.loads()` 解析一段文本，用 `json.load(file)` 解析已打开的文件；保存时用 `json.dump(data, file, ensure_ascii=False, indent=2)`，这样中文保留可读且有缩进。' },
+      { heading: '完整例子：保存学习档案', body: '下面程序把字典写入 JSON，再读回来。先运行一次，目录中会出现 `profile.json`。\n\n~~~python\nfrom pathlib import Path\nimport json\n\npath = Path("profile.json")\nprofile = {"name": "Ada", "completed": ["变量", "循环"]}\n\npath.write_text(json.dumps(profile, ensure_ascii=False, indent=2), encoding="utf-8")\nloaded = json.loads(path.read_text(encoding="utf-8"))\nprint(loaded["name"])\n~~~' },
+      { heading: '两类常见错误', body: '`FileNotFoundError` 表示文件路径或当前工作目录不对；先打印 `Path.cwd()`，不要立刻改文件名。`JSONDecodeError` 表示文件不是合法 JSON，例如少了引号或多了逗号；先定位报错行，再用最小样例确认格式。' },
+    ], 'from pathlib import Path\nimport json\n\npath = Path("settings.json")\nsettings = {"theme": "dark", "font_size": 16}\npath.write_text(json.dumps(settings, ensure_ascii=False), encoding="utf-8")', ['能用 Path 组合和检查文件路径', '能区分 json.load 与 json.loads', '能保存可读的 UTF-8 JSON'], [
+      ex('json-paths-1', '组合文件路径', '创建指向 data/scores.json 的 Path 对象 path。', '', 'from pathlib import Path\npath = Path("data") / "scores.json"', ['先从 pathlib 导入 Path。', 'Path("data") 表示目录。', '使用 / 组合下一级。'], has(/from\s+pathlib\s+import\s+Path/, /Path\s*\(\s*["']data["']\s*\)\s*\/\s*["']scores\.json["']/)),
+      ex('json-paths-2', '读取 JSON 文件', '打开 profile.json 并用 json.load 读取到 profile。', '', 'import json\nwith open("profile.json", encoding="utf-8") as file:\n    profile = json.load(file)', ['先 import json。', 'json.load 接收文件对象。', '不要写 json.loads(file)。'], has(/import\s+json/, /profile\s*=\s*json\.load\s*\(\s*file\s*\)/)),
+    ]),
+    lesson('classes', '28', '类与对象：给数据加行为', '当多个相似实体都需要保存状态和执行同类动作时，再使用类。', [
+      { heading: '类不是“更高级的字典”', body: '字典很适合一份简单数据。类适合把“这类东西有什么数据、能做什么”放在一起。例如一个 BankAccount 有 owner、balance，也有 deposit 方法；数据和操作它的规则彼此靠近。' },
+      { heading: '`self` 是当前对象', body: '`__init__` 在创建对象时执行。`self.owner = owner` 把传入的 owner 保存到这个对象；`self.balance` 表示这个对象自己的余额。调用 `ada.deposit(50)` 时，Python 会把 ada 自动传给 self。' },
+      { heading: '真实例子：不允许负数余额', body: '方法可以维护对象内部的约束。这里取款失败时返回 False，让调用者决定怎样提示用户。\n\n~~~python\nclass BankAccount:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n\n    def withdraw(self, amount):\n        if amount <= 0 or amount > self.balance:\n            return False\n        self.balance -= amount\n        return True\n\naccount = BankAccount("Ada", 100)\nprint(account.withdraw(30))  # True\nprint(account.balance)       # 70\n~~~' },
+      { heading: '什么时候先不要用类', body: '一次性的脚本、两三个独立函数、简单的字典数据，都不必为了“面向对象”强行写类。先让程序正确且清楚；当你发现同一组数据和操作反复一起出现，再抽象为类。' },
+    ], 'class Counter:\n    def __init__(self):\n        self.value = 0\n\n    def increment(self):\n        self.value += 1\n\ncounter = Counter()\ncounter.increment()\nprint(counter.value)  # 1', ['能解释类、对象和 self 的关系', '能在 __init__ 中初始化对象状态', '能用方法更新同一对象的数据'], [
+      ex('classes-1', '创建简单类', '定义 Student 类；初始化时将 name 保存到 self.name。', '', 'class Student:\n    def __init__(self, name):\n        self.name = name', ['类名 Student 首字母大写。', '__init__ 的第一个参数是 self。', '用 self.name 保存参数 name。'], has(/class\s+Student\s*:/, /def\s+__init__\s*\(\s*self\s*,\s*name\s*\)\s*:/, /self\.name\s*=\s*name/)),
+      ex('classes-2', '调用对象方法', '创建 Counter 对象 counter，再调用它的 increment 方法。', '', 'counter = Counter()\ncounter.increment()', ['创建对象时调用类名。', '结果保存到 counter。', '方法调用使用点号和括号。'], has(/counter\s*=\s*Counter\s*\(\s*\)/, /counter\.increment\s*\(\s*\)/)),
+    ]),
+    lesson('number-format', '06', '数字、精度与格式化', '处理金额、比例和四舍五入时，先区分“计算结果”与“显示结果”。', [
+      { heading: '整数和浮点数不会总是一起工作', body: '`int` 是整数，`float` 是带小数点的近似值。`5 / 2` 的结果是 `2.5`，即使两边都是整数；`5 // 2` 才是向下取整后的 `2`。金额和科学计算涉及浮点数时，可能看到 `0.1 + 0.2` 显示成接近而不等于 0.3 的小误差，这是二进制表示方式造成的。' },
+      { heading: 'round 用于计算，格式说明用于展示', body: '`round(3.14159, 2)` 得到数值 `3.14`；`f"{3.14159:.2f}"` 得到文本 `"3.14"`。前者适合继续计算，后者适合给用户看。若题目要求固定两位小数，使用 `:.2f`，不要依赖 print 的默认显示。' },
+      { heading: '真实例子：计算含税订单', body: '每一步都保留数值，最后才格式化。\n\n~~~python\nsubtotal = 128.5\ntax_rate = 0.06\ntotal = subtotal * (1 + tax_rate)\nprint(f"小计：¥{subtotal:.2f}")\nprint(f"应付：¥{total:.2f}")\n~~~\n\n不要写 `total = f"{subtotal * 1.06:.2f}"` 再继续加钱，因为 total 已经变成字符串。' },
+      { heading: '百分比和千位分隔符', body: '`f"{0.875:.1%}"` 显示 `87.5%`；`f"{1234567:,}"` 显示 `1,234,567`。它们只改变输出的样子，不改变原变量。' },
+    ], 'ratio = 7 / 8\ncount = 1234567\nprint(f"完成率：{ratio:.1%}")\nprint(f"访问量：{count:,}")', ['能区分 / 和 //', '能说明 round 与 :.2f 的差别', '能用 f-string 输出金额和百分比'], [
+      ex('number-format-1', '固定两位小数', '输出 amount，格式要求是固定两位小数。', 'print(f"金额：', 'print(f"金额：{amount:.2f}")', ['变量放进花括号。', '两位小数写 :.2f。', 'f-string 需要在引号前写 f。'], has(/f["'][^"']*\{\s*amount\s*:\.2f\s*\}/)),
+      ex('number-format-2', '计算整除和余数', '将 17 除以 5 的整商保存到 quotient，余数保存到 remainder。', '', 'quotient = 17 // 5\nremainder = 17 % 5', ['整除运算符是 //。', '余数运算符是 %。', '两个结果各保存一个变量。'], has(/quotient\s*=\s*17\s*\/\/\s*5/, /remainder\s*=\s*17\s*%\s*5/)),
+    ]),
+    lesson('string-tools', '07', '字符串方法与 f-string 细节', '把用户输入处理干净，再用稳定的格式输出。', [
+      { heading: '先清理，再判断', body: '`strip()` 去掉首尾空白，`lower()` 统一成小写，`split()` 按空白切成列表。用户输入 `"  YES  "` 时，直接和 `"yes"` 比较会失败；写成 `answer.strip().lower() == "yes"` 才是在比较处理后的值。' },
+      { heading: '替换、查找与安全访问', body: '`text.replace("-", " ")` 返回替换后的新字符串；`text.count("a")` 统计出现次数；`text.startswith("#")` 判断开头。`find()` 找不到时返回 -1，而 `index()` 找不到会抛出错误；不确定内容是否存在时优先使用 `in` 或 `find()`。' },
+      { heading: 'f-string 可以放表达式', body: '花括号内不仅能写变量，也能写简单表达式，例如 `f"{name.title()} 有 {len(items)} 项"`。字典键的引号要和 f-string 外层引号错开：`f"分数：{student[\'score\']}"`。不要把复杂业务逻辑塞进花括号，先算成变量再显示。' },
+      { heading: '真实例子：生成用户名', body: '先去掉空格、统一小写、把内部空格替换为点，最后再组合。\n\n~~~python\nname = "  Ada Lovelace  "\nclean = name.strip().lower().replace(" ", ".")\nusername = f"{clean}@syntaxlab.dev"\nprint(username)  # ada.lovelace@syntaxlab.dev\n~~~' },
+    ], 'title = "python 入门"\nprint(title.title())\nprint(f"长度：{len(title)}")', ['能串联常用字符串方法', '能解释字符串方法为何需要保存结果', '能在 f-string 中使用简单表达式'], [
+      ex('string-tools-1', '标准化回答', '将 answer 去首尾空格并转小写，保存到 clean。', '', 'clean = answer.strip().lower()', ['先调用 strip。', '再调用 lower。', '把结果保存到 clean。'], has(/clean\s*=\s*answer\.strip\s*\(\s*\)\.lower\s*\(\s*\)/)),
+      ex('string-tools-2', '格式化字典字段', '输出 student 字典中 name 键的值，格式为“姓名：Ada”一类文本。', '', 'print(f"姓名：{student[\'name\']}")', ['使用 f-string。', '字典值用 student[\'name\'] 读取。', '外层使用双引号更清楚。'], has(/print\s*\(\s*f["'][\s\S]*student\s*\[\s*["']name["']\s*\]/)),
+    ]),
+    lesson('boolean-branches', '09', '布尔值、真值与多分支', '不仅能写 if，更要理解每个条件为什么会走到那个分支。', [
+      { heading: '布尔值只有 True 和 False', body: '比较通常得到布尔值，例如 `score >= 60`。也可以把条件先保存为命名清楚的变量：`is_passing = score >= 60`。这样调试时能直接 print 它，不必在一长串条件中猜哪里错了。' },
+      { heading: '空值也能用于判断，但要读得清楚', body: '空字符串 `""`、空列表 `[]`、空字典 `{}`、数字 `0`、`None` 在条件中都视为 False；非空内容视为 True。因此 `if tasks:` 可读作“如果有任务”。但要判断是否缺失时，写 `if value is None:`，不要写 `value == None`。' },
+      { heading: 'elif 按顺序，不会回头', body: 'Python 从上到下检查分支，命中一个就跳过剩余分支。所以成绩判断应先写更严格的 `>= 90`，再写 `>= 60`；如果反过来，90 分会被第一个条件提前拦住。' },
+      { heading: '真实例子：给成绩分类', body: '边界测试应至少包含 59、60、89、90、100。\n\n~~~python\nscore = 90\nif score < 0 or score > 100:\n    result = "无效分数"\nelif score >= 90:\n    result = "优秀"\nelif score >= 60:\n    result = "及格"\nelse:\n    result = "待提高"\nprint(result)\n~~~' },
+    ], 'tasks = []\nif tasks:\n    print("开始第一项：", tasks[0])\nelse:\n    print("今天没有待办")', ['能识别常见的真值和假值', '能按从严格到宽松的顺序组织 elif', '能使用 is None 判断缺失值'], [
+      ex('boolean-branches-1', '判断空列表', '当 tasks 非空时输出“有任务”。', '', 'if tasks:\n    print("有任务")', ['空列表会被当作 False。', '直接把 tasks 放到 if 后。', '条件行需要冒号。'], has(/if\s+tasks\s*:/)),
+      ex('boolean-branches-2', '判断 None', '当 result 是 None 时输出“尚无结果”。', '', 'if result is None:\n    print("尚无结果")', ['使用 is None。', '不要用 == None。', '条件行最后有冒号。'], has(/if\s+result\s+is\s+None\s*:/)),
+    ]),
+    lesson('match-case', '10', 'match / case：按固定选项分流', '当一个值要匹配多个明确选项时，match 比一长串 == 更易读。', [
+      { heading: '适用场景：有限且明确的类别', body: 'Python 3.10+ 支持 `match value:`。每个 `case` 匹配一种可能，`case _:` 是兜底分支。它适合命令、星期、状态码等离散选项；范围判断如 `score >= 60` 仍应使用 if。' },
+      { heading: '字符串命令要先标准化', body: '用户可能输入 `ADD`、`add` 或两边有空格。先用 `command = input().strip().lower()`，再 match，才能把同一种命令放进同一个分支。' },
+      { heading: '真实例子：简单菜单', body: '每个 case 的缩进都属于 match；下划线不是变量名，而是“其余所有情况”。\n\n~~~python\ncommand = "help"\nmatch command:\n    case "add":\n        print("新增一项")\n    case "list":\n        print("显示清单")\n    case "help":\n        print("可用命令：add / list / quit")\n    case _:\n        print("未知命令")\n~~~' },
+      { heading: '兼容性提示', body: '如果课程环境或考试要求 Python 3.9 及更早版本，`match` 会报 SyntaxError，此时改用 if / elif。先用 `python --version` 确认解释器。' },
+    ], 'command = input("命令：").strip().lower()\nmatch command:\n    case "quit":\n        print("再见")\n    case _:\n        print("继续处理")', ['知道 match 适合固定选项而非数值范围', '能使用 case _ 处理未知输入', '能在使用前确认 Python 版本'], [
+      ex('match-case-1', '补全退出命令', '匹配 command 为 quit 时输出“再见”。', 'match command:\n', 'match command:\n    case "quit":\n        print("再见")', ['match 后面写 command。', 'case 之后写字符串 quit。', '两个语句都要遵循缩进。'], has(/match\s+command\s*:/, /case\s+["']quit["']\s*:/)),
+      ex('match-case-2', '添加兜底分支', '为 match 语句添加未知命令的兜底输出。', 'match command:\n    case "start":\n        print("开始")', 'match command:\n    case "start":\n        print("开始")\n    case _:\n        print("未知命令")', ['兜底模式是下划线。', '写作 case _:。', '它应和其他 case 对齐。'], has(/case\s+_\s*:/)),
+    ]),
+    lesson('range-loop', '12', 'range 与 for：精确控制次数', '把“重复几次”变成可验证的范围，而不是不断猜边界。', [
+      { heading: 'range 的结束值永远不取到', body: '`range(5)` 是 0、1、2、3、4；`range(2, 5)` 是 2、3、4；`range(10, 0, -2)` 是 10、8、6、4、2。读 range 时先问：起点、停止线、步长分别是什么？' },
+      { heading: '索引遍历只在真正需要位置时使用', body: '只需要元素时优先 `for name in names`。需要位置和值时用 `enumerate`；只有要通过下标访问相邻元素或修改特定位置时，才写 `for index in range(len(names))`。' },
+      { heading: '真实例子：打印乘法表的一行', body: '循环变量 n 会依次取 1 到 9；右端的 10 只是停止线。\n\n~~~python\nbase = 7\nfor n in range(1, 10):\n    print(f"{base} × {n} = {base * n}")\n~~~' },
+      { heading: '每轮只做一件清楚的事', body: '在循环前初始化累计变量；在循环内更新它；循环后使用最终结果。若循环输出与最终输出混在一起，调试时先加上“当前轮次”和“当前值”的 print。' },
+    ], 'total = 0\nfor number in range(1, 101):\n    total += number\nprint(total)  # 5050', ['能手算常见 range 的序列', '能解释 range 的停止线', '能在循环中正确维护累加器'], [
+      ex('range-loop-1', '倒序循环', '让 number 依次取 5、4、3、2、1。', 'for number in range(', 'for number in range(5, 0, -1):\n    print(number)', ['起点是 5。', '停止线写 0，0 不会被取到。', '步长是 -1。'], has(/range\s*\(\s*5\s*,\s*0\s*,\s*-1\s*\)/)),
+      ex('range-loop-2', '累计 1 到 10', '用 for 和 total += number 计算 1 到 10 的和。', '', 'total = 0\nfor number in range(1, 11):\n    total += number\nprint(total)', ['累计变量从 0 开始。', '要包含 10，停止线写 11。', '更新写在循环体中。'], has(/total\s*=\s*0/, /range\s*\(\s*1\s*,\s*11\s*\)/, /total\s*\+=\s*number/)),
+    ]),
+    lesson('while-control', '13', 'while、break 与 continue', '需要“直到某件事发生”为止时使用 while，并为它设计安全出口。', [
+      { heading: 'while 的三要素', body: '写 while 前先在纸上回答：初始值是什么？继续条件是什么？每轮哪里改变条件？例如倒计时有初始 `seconds = 3`、条件 `seconds > 0`、更新 `seconds -= 1`。缺任何一个都可能死循环。' },
+      { heading: 'break 立即离开整个循环', body: '`break` 适合“已经找到答案，不必再找”。它跳到循环后第一行，不会执行剩余轮次。搜索列表时找到目标后 break，比继续遍历更符合意图。' },
+      { heading: 'continue 跳过当前轮', body: '`continue` 会跳过本轮剩余语句，直接开始下一轮。输入清洗时可以跳过空行；要确保循环变量的更新位置不会被 continue 意外跳过。' },
+      { heading: '真实例子：直到用户输入 quit', body: '把输入标准化后再判断，避免 Quit 或前后空格失效。\n\n~~~python\nwhile True:\n    command = input("命令（quit 结束）：").strip().lower()\n    if command == "quit":\n        break\n    if not command:\n        continue\n    print(f"已收到：{command}")\nprint("程序结束")\n~~~' },
+    ], 'attempts = 3\nwhile attempts > 0:\n    print(f"还剩 {attempts} 次")\n    attempts -= 1\nprint("次数用完")', ['能写出 while 的初值、条件和更新', '能解释 break 和 continue 的不同', '能避免 continue 造成的死循环'], [
+      ex('while-control-1', '补全倒计时更新', '让 seconds 从 3 倒数到 1 后停止。', 'seconds = 3\nwhile seconds > 0:\n    print(seconds)\n', 'seconds = 3\nwhile seconds > 0:\n    print(seconds)\n    seconds -= 1', ['条件依赖 seconds。', '每轮要让它减少。', '使用 -= 1。'], has(/seconds\s*-=?\s*1/)),
+      ex('while-control-2', '找到目标后停止', '遍历 items，找到 target 时输出“找到”并停止循环。', '', 'for item in items:\n    if item == target:\n        print("找到")\n        break', ['先比较 item 与 target。', '成功时输出提示。', 'break 离开循环。'], has(/if\s+item\s*==\s*target\s*:/, /break/)),
+    ]),
+    lesson('list-methods', '16', '列表方法、切片与复制', '学习“会原地修改”与“会返回新列表”的区别，避免数据悄悄变掉。', [
+      { heading: '常用修改方法', body: '`append(x)` 在末尾添加一个元素，`extend(items)` 逐个添加一组元素，`insert(index, x)` 插入位置，`remove(x)` 删除第一个匹配值，`pop()` 取出并删除末尾元素。它们大多直接修改原列表，通常返回 `None`。' },
+      { heading: '切片产生新列表', body: '`items[:3]` 取前三项，`items[::2]` 每隔一项取一个，`items[::-1]` 得到倒序副本。切片不会修改原列表。排序也有两种：`items.sort()` 原地排序，`sorted(items)` 返回新列表。' },
+      { heading: '别把同一个列表绑给两个名字', body: '`backup = items` 不是复制，两者指向同一个列表；修改 backup 也会影响 items。要复制一层列表用 `backup = items.copy()` 或 `items[:]`。嵌套列表需要进一步学习 `copy.deepcopy`，此处先不要依赖浅复制。' },
+      { heading: '真实例子：维护待办清单', body: '执行完一项时，pop(0) 会同时“取出”和“删除”。\n\n~~~python\ntasks = ["安装", "练习", "复盘"]\ncurrent = tasks.pop(0)\nprint(f"正在做：{current}")\nprint(f"剩余：{tasks}")\n~~~' },
+    ], 'scores = [88, 72, 95]\nranked = sorted(scores, reverse=True)\nprint(ranked)\nprint(scores)', ['能区分 append 与 extend', '能用切片获得新列表', '能解释 backup = items 不是复制'], [
+      ex('list-methods-1', '追加一个元素', '将 "Python" 加到 languages 的末尾。', '', 'languages.append("Python")', ['使用 append。', '字符串需要引号。', 'append 后有括号。'], has(/languages\.append\s*\(\s*["']Python["']\s*\)/)),
+      ex('list-methods-2', '复制列表', '将 items 的副本保存到 backup。', '', 'backup = items.copy()', ['调用 copy 方法。', '不要直接写 backup = items。', '方法调用需要括号。'], has(/backup\s*=\s*items\.copy\s*\(\s*\)/)),
+    ]),
+    lesson('dict-basics', '18', '字典：用键描述一条记录', '当每项数据有名字而不是位置时，用字典让程序像业务语言一样可读。', [
+      { heading: '键和值各自扮演什么角色', body: '字典写作 `{key: value}`。键应稳定、唯一且常用字符串，例如 `{"name": "Ada", "score": 92}`。`student["score"]` 按键取值；这个键不存在会抛出 KeyError，所以不确定时使用 `student.get("score")`。' },
+      { heading: '新增、更新和默认值', body: '`student["score"] = 95` 在键已有时更新、没有时新增。`data.get("visits", 0)` 表示“没有 visits 就先当作 0”，适合计数。`setdefault` 也能设置默认值，但初学阶段先用 get + 赋值更容易读。' },
+      { heading: '真实例子：统计词频', body: '每次读到一个词，先拿已有次数；若没有，默认从 0 开始。\n\n~~~python\nwords = ["python", "code", "python"]\ncounts = {}\nfor word in words:\n    counts[word] = counts.get(word, 0) + 1\nprint(counts)  # {\'python\': 2, \'code\': 1}\n~~~' },
+      { heading: '避免把 get 当成万能修复', body: '若键理论上必须存在，例如课程对象必须有 name，使用 `student["name"]` 更容易暴露不完整数据。get 适合“可选字段”或“没有就采用默认值”的业务规则。' },
+    ], 'profile = {"name": "Ada", "level": 1}\nprofile["level"] += 1\nprint(profile["level"])  # 2', ['能读写字典中的字段', '能用 get 提供合理默认值', '能用字典完成简单计数'], [
+      ex('dict-basics-1', '读取字典分数', '将 student 中 score 键的值保存到 score。', '', 'score = student["score"]', ['使用方括号。', '键 score 是字符串。', '结果保存到 score。'], has(/score\s*=\s*student\s*\[\s*["']score["']\s*\]/)),
+      ex('dict-basics-2', '安全获得默认值', '将 visits 的值读到 count；键不存在时使用 0。', '', 'count = data.get("visits", 0)', ['方法是 get。', '第一个参数是键 visits。', '第二个参数是默认值 0。'], has(/count\s*=\s*data\.get\s*\(\s*["']visits["']\s*,\s*0\s*\)/)),
+    ]),
+    lesson('dict-loop', '19', '遍历字典：键、值与键值对', '读清楚循环变量代表什么，才能正确处理多条结构化数据。', [
+      { heading: '三种遍历方式', body: '`for key in data:` 和 `for key in data.keys():` 都遍历键；`for value in data.values():` 遍历值；`for key, value in data.items():` 同时遍历键值对。最常用也最清楚的是 items，因为两个变量的来源一眼可见。' },
+      { heading: '不要在遍历时修改同一个字典的键', body: '循环中新增或删除正在遍历的字典键，可能引发 RuntimeError。若确实要删，先遍历 `list(data)` 的副本，或更好地创建一个满足条件的新字典。更新已有键的值通常是安全的，但仍要确保规则清楚。' },
+      { heading: '真实例子：格式化个人资料', body: '字典没有“固定显示顺序”的语义要求，因此展示层可以自己决定字段标签。\n\n~~~python\nprofile = {"name": "Ada", "city": "London"}\nlabels = {"name": "姓名", "city": "城市"}\nfor key, value in profile.items():\n    print(f"{labels[key]}：{value}")\n~~~' },
+      { heading: '嵌套字典先逐层读取', body: '当 `student["contact"]` 本身又是字典时，先保存 `contact = student["contact"]`，再读取 `contact["email"]`。分两步比连续多层方括号更容易定位缺失在哪一层。' },
+    ], 'scores = {"Ada": 92, "Lin": 78}\nfor name, score in scores.items():\n    print(f"{name}：{score}")', ['能选择 keys、values、items', '能用两个变量解包键值对', '知道遍历时避免增删字典键'], [
+      ex('dict-loop-1', '遍历键值对', '让 name 和 score 分别得到 scores 中的键和值。', 'for name, score in ', 'for name, score in scores.items():\n    print(name, score)', ['使用 scores.items()。', '两个变量用逗号分隔。', '循环行末尾有冒号。'], has(/for\s+name\s*,\s*score\s+in\s+scores\.items\s*\(\s*\)\s*:/)),
+      ex('dict-loop-2', '遍历所有值', '计算 scores 所有值的和。', '', 'total = sum(scores.values())', ['字典的所有值使用 values()。', 'sum 可以求和。', '结果保存到 total。'], has(/total\s*=\s*sum\s*\(\s*scores\.values\s*\(\s*\)\s*\)/)),
+    ]),
+    lesson('function-returns', '22', 'return、早返回与函数契约', '让函数的输入、输出和失败情形明确，调用者才知道如何使用它。', [
+      { heading: '函数契约写在动手前', body: '定义函数前先用一句话说清：输入是什么、返回什么、非法输入怎么办。例如 `find_first_even(numbers)` 接收整数列表，返回第一个偶数；若没有则返回 None。这就是函数的契约。' },
+      { heading: 'return 立即结束函数', body: 'return 后面的语句不会执行。遇到不符合条件的输入时可以“早返回”，减少多层 else。调用者应检查可能的 None，而不是假设一定有值。' },
+      { heading: '真实例子：安全计算平均分', body: '空列表没有平均值，所以先返回 None；非空时再计算。\n\n~~~python\ndef average(numbers):\n    if not numbers:\n        return None\n    return sum(numbers) / len(numbers)\n\nresult = average([])\nif result is None:\n    print("没有数据")\nelse:\n    print(f"平均值：{result:.1f}")\n~~~' },
+      { heading: 'print 不是返回值', body: '函数内 print 只把内容显示到屏幕，`result = print("x")` 得到的是 None。需要让外部继续使用计算结果时，一定 return。' },
+    ], 'def is_adult(age):\n    if age < 0:\n        return False\n    return age >= 18\n\nprint(is_adult(20))', ['能先描述函数的输入和输出', '能在空数据等边界时早返回', '能区分 print 和 return'], [
+      ex('function-returns-1', '空列表早返回', '当 numbers 为空时，函数返回 None。', 'def average(numbers):\n', 'def average(numbers):\n    if not numbers:\n        return None\n    return sum(numbers) / len(numbers)', ['空列表可用 not numbers 判断。', 'return None 表示没有可用结果。', '非空时再计算。'], has(/if\s+not\s+numbers\s*:/, /return\s+None/)),
+      ex('function-returns-2', '返回而不是打印', '定义 double(number)，返回 number 的两倍。', '', 'def double(number):\n    return number * 2', ['函数定义使用 def。', '计算结果前写 return。', '不要用 print 代替 return。'], has(/def\s+double\s*\(\s*number\s*\)\s*:/, /return\s+number\s*\*\s*2/)),
+    ]),
+    lesson('exceptions-detail', '25', '异常细讲：只处理能恢复的问题', '把错误变成有意义的分支，同时保留真正 bug 的线索。', [
+      { heading: '异常类型表达失败原因', body: '转换失败常见 `ValueError`，文件不存在是 `FileNotFoundError`，字典键不存在是 `KeyError`，除数为 0 是 `ZeroDivisionError`。捕获具体类型能让程序只处理预期情况，其他 bug 仍然清晰报出。' },
+      { heading: 'try / except / else / finally 的职责', body: 'try 放可能失败的最小代码；except 处理该失败；else 放“没有异常才执行”的后续逻辑；finally 无论成功失败都会执行，适合必要清理。不要把整段程序都放进 try，这会让错误来源模糊。' },
+      { heading: '真实例子：反复请求合法年龄', body: '异常处理只包 `int` 转换；范围规则仍用普通 if 判断。\n\n~~~python\nwhile True:\n    try:\n        age = int(input("年龄："))\n    except ValueError:\n        print("请输入整数，例如 18")\n        continue\n    if age < 0:\n        print("年龄不能为负数")\n        continue\n    break\nprint(f"已记录：{age}")\n~~~' },
+      { heading: '什么时候让异常继续抛出', body: '程序员写错变量名、数据结构与预期不符、网络服务异常等，通常需要先看完整回溯并修复根因，不应随手 `except Exception: pass`。面向用户的提示和面向开发者的排错是两件事。' },
+    ], 'try:\n    divisor = int(input("除数："))\n    print(100 / divisor)\nexcept ValueError:\n    print("请输入整数")\nexcept ZeroDivisionError:\n    print("除数不能为 0")', ['能根据失败原因选择异常类型', '能将 try 范围保持最小', '能结合 except 与 continue 重新请求输入'], [
+      ex('exceptions-detail-1', '捕获无效整数', '捕获 int 转换产生的 ValueError。', 'try:\n    age = int(text)\n', 'try:\n    age = int(text)\nexcept ValueError:\n    print("请输入整数")', ['异常类型是 ValueError。', 'except 与 try 对齐。', 'except 行末尾要有冒号。'], has(/except\s+ValueError\s*:/)),
+      ex('exceptions-detail-2', '处理不存在的文件', '读取文件时捕获 FileNotFoundError 并提示用户。', '', 'try:\n    with open("data.txt", encoding="utf-8") as file:\n        content = file.read()\nexcept FileNotFoundError:\n    print("文件不存在")', ['异常类型是 FileNotFoundError。', '打开和读取放在 try 中。', 'except 与 try 对齐。'], has(/except\s+FileNotFoundError\s*:/)),
+    ]),
+    lesson('testing-debugging', '30', '调试与测试：让程序自己证明自己', '别只拿一个“看起来正常”的输入试运行；为边界和错误准备明确检查。', [
+      { heading: '先复现，再缩小，再修复', body: '遇到 bug 时先保存能稳定触发的问题输入；把长程序缩小到最少几行；用 print 或断点观察变量；提出一个原因后只改一件事，最后用原输入和相邻边界再次验证。不要边改边猜多个原因。' },
+      { heading: 'assert 是最小测试工具', body: '`assert actual == expected` 在条件不成立时抛出 AssertionError。它适合给函数写可重复的检查：`assert is_even(2) is True`。测试应覆盖普通值、边界值、空值和错误输入，而不是只复制示例。' },
+      { heading: '真实例子：测试折扣函数', body: '函数规则与测试数据并列，别人能快速看懂边界。\n\n~~~python\ndef discount(price, member):\n    return price * 0.9 if member else price\n\nassert discount(100, True) == 90\nassert discount(100, False) == 100\nassert discount(0, True) == 0\nprint("测试通过")\n~~~' },
+      { heading: '读回溯的顺序', body: '先看最底部的异常类型与消息，再向上找第一个属于自己文件的行。该行不是永远的根因，但它是最可靠的起点。报错、输入和最小复现代码要一起记录。' },
+    ], 'def clamp(value, low, high):\n    return max(low, min(value, high))\n\nassert clamp(5, 0, 10) == 5\nassert clamp(-1, 0, 10) == 0\nassert clamp(12, 0, 10) == 10', ['能为一个函数设计普通与边界测试', '能用 assert 写基本检查', '能按证据而不是猜测调试'], [
+      ex('testing-debugging-1', '为偶数函数写断言', '断言 is_even(4) 的结果为 True。', '', 'assert is_even(4) is True', ['使用 assert 开头。', '调用 is_even(4)。', '布尔结果可用 is True 比较。'], has(/assert\s+is_even\s*\(\s*4\s*\)\s+is\s+True/)),
+      ex('testing-debugging-2', '测试边界值', '断言 clamp(12, 0, 10) 返回 10。', '', 'assert clamp(12, 0, 10) == 10', ['调用 clamp。', '传入 12、0、10。', '使用 == 比较期望结果。'], has(/assert\s+clamp\s*\(\s*12\s*,\s*0\s*,\s*10\s*\)\s*==\s*10/)),
+    ]),
+    lesson('mini-project', '31', '项目实战：命令行待办清单', '把变量、循环、列表、函数和文件组合为一个小而完整的程序。', [
+      { heading: '先定最小可用版本', body: '这个项目只做四件事：显示任务、添加任务、完成任务、退出。先让数据仅保存在运行期间，确认交互正确后，再将列表保存到 JSON。小项目的关键不是功能多，而是每个动作都有明确输入、状态变化和输出。' },
+      { heading: '把每个命令拆成函数', body: '`show_tasks(tasks)` 只展示；`add_task(tasks, title)` 只新增；主循环只负责读取命令与分发。这样添加“删除任务”时不必把所有逻辑重新读一遍。' },
+      { heading: '完整最小版本', body: '复制后直接运行。输入 `add 学习循环`、`list`、`done 1`、`quit` 依次体验每个分支。\n\n~~~python\ndef show_tasks(tasks):\n    if not tasks:\n        print("暂无任务")\n        return\n    for number, task in enumerate(tasks, start=1):\n        print(f"{number}. {task}")\n\ntasks = []\nwhile True:\n    command = input("命令 add/list/done/quit：").strip()\n    if command == "quit":\n        break\n    if command == "list":\n        show_tasks(tasks)\n    elif command.startswith("add "):\n        tasks.append(command[4:].strip())\n    elif command.startswith("done "):\n        index = int(command[5:]) - 1\n        print(f"已完成：{tasks.pop(index)}")\n    else:\n        print("未知命令")\n~~~' },
+      { heading: '下一步改进清单', body: '为 `done` 的输入加 try/except；检查下标是否在范围内；拒绝空任务；最后把 tasks 写进 JSON。每次只加一项，并为新规则补一条测试或手动检查步骤。' },
+    ], 'def show_tasks(tasks):\n    if not tasks:\n        print("暂无任务")\n        return\n    for number, task in enumerate(tasks, start=1):\n        print(f"{number}. {task}")', ['能从需求中识别状态、命令和函数', '能用循环维持命令行程序', '能为项目选择下一项小而可验证的改进'], [
+      ex('mini-project-1', '添加待办任务', '将 title 添加到 tasks 列表末尾。', '', 'tasks.append(title)', ['任务列表是 tasks。', '添加方法是 append。', '传入 title。'], has(/tasks\.append\s*\(\s*title\s*\)/)),
+      ex('mini-project-2', '按序号展示任务', '从 1 开始遍历 tasks，打印编号和任务文本。', '', 'for number, task in enumerate(tasks, start=1):\n    print(f"{number}. {task}")', ['使用 enumerate。', 'start=1 用于展示编号。', 'f-string 显示编号和任务。'], has(/enumerate\s*\(\s*tasks\s*,\s*start\s*=\s*1\s*\)/, /print\s*\(\s*f["'][\s\S]*\{\s*number\s*\}/)),
+    ], '完成这课后，尝试自己实现一个命令：delete 2。先写清楚输入是什么、下标怎样转换、无效序号如何提示，再写代码。'),
+  ].sort((first, second) => Number(first.chapter?.match(/\d+/)?.[0] ?? 99) - Number(second.chapter?.match(/\d+/)?.[0] ?? 99) || Number(first.number) - Number(second.number)),
 }
