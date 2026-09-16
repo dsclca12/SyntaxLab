@@ -10,7 +10,7 @@ SyntaxLab is a small, static learning workspace where you read a concept, edit e
 
 - 15 short TOML lessons, from key/value pairs to `pyproject.toml`
 - 7 introductory Computer Level 2 lessons covering public foundations, Word, Excel, PowerPoint, Python, and review habits
-- A 45-chapter Python curriculum, with one focused syntax topic per chapter, detailed explanations, worked examples, goals, checks, and hands-on exercises
+- A 45-chapter Python curriculum with 100+ item-by-item syntax and API explanations, worked examples, goals, checks, and hands-on exercises
 - Real TOML parsing and semantic exercise checks
 - Complete, repair, and write-from-requirement exercises
 - Progressive hints after failed attempts

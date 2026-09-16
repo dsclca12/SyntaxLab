@@ -71,6 +71,33 @@ describe('learning content contracts', () => {
     }
   })
 
+  it('gives core Python syntax and methods individual explanations', () => {
+    const requiredDepth: Record<string, string[]> = {
+      values: ['`int`', '`float`', '`str`', '`bool`', '`input`', '`print`'],
+      strings: ['索引', '切片', '`len`', 'f-string'],
+      'string-tools': ['`strip`', '`find`', '`replace`', '`split`', '`join`'],
+      'range-loop': ['`range(stop)`', '`range(start, stop)`', '`for ... else`'],
+      'while-control': ['`while`', '`break`', '`continue`', '`while ... else`'],
+      'list-methods': ['`append`', '`extend`', '`insert`', '`remove`', '`sort`', '`copy`'],
+      'tuples-sets': ['单元素逗号', '`count`', '`set()`', '`add`', '并集', '子集'],
+      'dict-basics': ['`mapping[key]`', '`setdefault`', '`popitem`', '字典推导式'],
+      comprehensions: ['列表推导式', '集合推导式', '字典推导式', '生成器表达式'],
+      functions: ['`def`', '形参与实参', '`/` 与 `*`', '`*args`'],
+      files: ['`open`', '`read`', '`write`', '`tell`', '`with`'],
+      'exceptions-detail': ['`try`', '`except', '`else`', '`finally`', '`raise`'],
+      modules: ['`import module`', '`from module import name`', '`as`', '相对导入', '`__all__`'],
+      classes: ['`class`', '`self`', '`__init__`', '类属性', '`@classmethod`'],
+      'type-hints': ['容器泛型', '联合类型', '`Literal`', '`TypedDict`', '`Protocol`', '`Any`'],
+    }
+
+    for (const [lessonId, expectedHeadings] of Object.entries(requiredDepth)) {
+      const lesson = pythonModule.lessons.find((candidate) => candidate.id === lessonId)
+      const headings = lesson?.sections.map((section) => section.heading).join('\n') ?? ''
+      expect(lesson, lessonId).toBeDefined()
+      for (const heading of expectedHeadings) expect(headings, `${lessonId}: ${heading}`).toContain(heading)
+    }
+  })
+
   it('keeps the binary and hexadecimal source explanations intact in the app', () => {
     for (const module of [binaryModule, hexadecimalModule]) {
       expect(module.lessons.every((lesson) => (lesson.content?.length ?? 0) > 500), module.id).toBe(true)

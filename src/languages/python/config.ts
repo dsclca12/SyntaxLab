@@ -46,7 +46,7 @@ const lesson = (
     { heading: '常见误区', body: lecture.misconception },
     { heading: '无 AI 验收标准', body: lecture.acceptance },
   ] : []
-  return { id, number, title, eyebrow: 'PYTHON 系统教程', summary, chapter: `第 ${Number(number)} 章 · ${title}`, sections: [...sections, ...(zeroBaseGuides[id] ?? []), ...lectureSections], example, goals, exercises, note, walkthrough: detail.walkthrough, checkpoints: detail.checkpoints, resources: detail.resources }
+  return { id, number, title, eyebrow: 'PYTHON 系统教程', summary, chapter: `第 ${Number(number)} 章 · ${title}`, sections: [...sections, ...(zeroBaseGuides[id] ?? []), ...(syntaxDeepDives[id] ?? []), ...lectureSections], example, goals, exercises, note, walkthrough: detail.walkthrough, checkpoints: detail.checkpoints, resources: detail.resources }
 }
 
 // 每个示例都配一份“读代码路线”。初学者最容易卡住的不是记不住关键字，
@@ -170,6 +170,150 @@ const zeroBaseGuides: Record<string, { heading: string; body: string }[]> = {
     { heading: '第三方库与标准库的区别', body: '第三方库要在已激活的 venv 中安装，安装后立刻用 import 验证。\n\n~~~powershell\npython -m pip install requests\npython -c "import requests; print(requests.__version__)"\n~~~\n\nimport 成功说明当前解释器确实看得到这个库。' },
   ],
   algorithm: [{ heading: '做题前的固定四步', body: '先写：1. 输入是什么；2. 输出几行；3. 中间处理；4. 最小值和边界值。下面是“统计及格人数”的展开版：\n\n~~~python\nscores = [59, 60, 88]\ncount = 0\nfor score in scores:\n    if score >= 60:\n        count += 1\nprint(count)\n~~~\n\n预期输出 2。先确认这种展开版正确，再学习更短的列表推导式。' }],
+}
+
+// 系统教程不能只罗列名称。下面把初学者最常查、也最容易混淆的语法和方法
+// 拆成独立小节，逐项说明输入、返回值、副作用与边界。
+const syntaxDeepDives: Record<string, { heading: string; body: string }[]> = {
+  values: [
+    { heading: '`int`：整数', body: '`int` 表示没有小数部分的整数，大小只受可用内存限制。`int("18")` 把整数字符串转成 18；`int(3.9)` 会向 0 截断为 3，不是四舍五入；`int("3.9")` 会触发 ValueError。' },
+    { heading: '`float`：浮点数', body: '`float` 表示近似小数，`float("3.14")` 可解析文本。二进制浮点不能精确表示所有十进制小数，因此金额不要直接依赖 `==`；显示位数与实际存储精度是两件事。' },
+    { heading: '`str`：字符串', body: '`str` 保存 Unicode 文本，`str(18)` 得到 `"18"`。数字字符串仍然是文本：`"10" + "2"` 得到 `"102"`；需要计算时先显式转换，避免让数据类型靠猜。' },
+    { heading: '`bool`：布尔值', body: '`bool` 只有 True 和 False。`bool(0)`、`bool("")`、`bool([])` 是 False，非零数和非空容器通常是 True；但不要把“为空”和“没有值 None”在业务含义上混为一谈。' },
+    { heading: '`type` 与 `isinstance`', body: '`type(value)` 返回对象的实际类型，适合学习时观察。程序判断类型通常优先用 `isinstance(value, int)`，因为它也能正确处理子类；外部输入更应通过解析和验证，而不是到处检查类型。' },
+    { heading: '`input`：始终返回字符串', body: '`input(prompt)` 显示提示并等待一行输入，删掉结尾换行后返回 str。要读取数字应写 `age = int(input("年龄："))`；转换可能失败，所以真实程序需要给无效输入提供明确提示。' },
+    { heading: '`print`：逐个参数说明', body: '`print(*objects, sep=" ", end="\\n", file=..., flush=False)` 会先把对象转成文本。`sep` 控制多个对象之间的分隔，`end` 控制末尾，`file` 可改写入目标，`flush=True` 要求立即刷新；print 的返回值是 None。' },
+  ],
+  strings: [
+    { heading: '单引号、双引号与三引号', body: '单引号和双引号创建同一种 str，选择能减少转义的一种即可。三引号允许跨行，常用于文档字符串和确实需要保留换行的文本；它不会自动删除代码缩进。' },
+    { heading: '转义字符逐项理解', body: '`\\n` 是换行，`\\t` 是制表符，`\\\\` 表示一个反斜杠，`\\"` 或 `\\\'` 表示与外层冲突的引号。原始字符串前缀 `r` 会减少反斜杠处理，但不能以单个反斜杠结尾。' },
+    { heading: '索引：`text[index]`', body: '索引从 0 开始，`text[0]` 是首字符，`text[-1]` 是末字符。索引必须落在范围内，否则触发 IndexError；Python 字符串按 Unicode 字符索引，不等同于 UTF-8 字节位置。' },
+    { heading: '切片：`text[start:stop:step]`', body: 'start 包含、stop 不包含，任一部分都可省略。`text[::-1]` 倒序，`text[::2]` 隔一个取一个；切片越过边界会安全截断，不会像单个索引那样报错。step 不能为 0。' },
+    { heading: '`len` 与字符串不可变', body: '`len(text)` 返回字符数量。字符串不能原地修改，`text[0] = "P"` 会报 TypeError；`replace`、`strip`、`lower` 等方法都返回新字符串，必须接住返回值。' },
+    { heading: '拼接、重复与成员判断', body: '`+` 拼接字符串，`*` 按整数次数重复，`in` 检查子串。循环中大量 `result += piece` 可能反复创建字符串，已有片段列表时通常用 `"".join(parts)` 更清楚。' },
+    { heading: 'f-string 表达式与格式说明', body: '`f"{name}: {score}"` 会计算大括号内表达式。`{price:.2f}` 保留两位小数，`{ratio:.1%}` 显示百分比，`{count:04d}` 左侧补零；格式化改变显示文本，不改变原数值。' },
+  ],
+  'string-tools': [
+    { heading: '`strip`、`lstrip`、`rstrip`', body: '`strip()` 删除两端空白，lstrip 只处理左端，rstrip 只处理右端。参数表示“要删除的字符集合”，不是完整前后缀；删除固定前缀应使用 removeprefix。' },
+    { heading: '`lower`、`upper`、`title`、`casefold`', body: 'lower 和 upper 转换大小写，title 把单词首字母大写但不懂所有姓名规则。需要不区分大小写比较时，casefold 比 lower 更全面；这些方法都返回新字符串。' },
+    { heading: '`find`、`index`、`count`', body: '`find(sub)` 找不到时返回 -1，`index(sub)` 找不到时抛 ValueError，`count(sub)` 返回不重叠出现次数。只判断是否存在时直接用 `sub in text`，意图比和 -1 比较更清楚。' },
+    { heading: '`replace` 与删除文本', body: '`replace(old, new, count)` 返回替换后的新字符串，可用可选 count 限制次数。删除就是把 new 写成空字符串；原字符串不变，所以要写 `text = text.replace(...)` 或保存到新变量。' },
+    { heading: '`split`、`rsplit`、`splitlines`', body: '`split()` 不传参数会按连续空白切分并忽略两端空白；`split(",")` 则保留空字段。rsplit 从右侧开始限制次数，splitlines 按各种换行符切分，适合处理多行文本。' },
+    { heading: '`join`：由分隔符调用', body: '`", ".join(names)` 把一组字符串连接起来。序列中任何元素不是 str 都会报 TypeError，可先写 `map(str, values)`；join 不会自动在开头或结尾添加分隔符。' },
+    { heading: '`startswith`、`endswith` 与移除前后缀', body: 'startswith/endswith 返回 bool，并可接收前缀元组。`removeprefix` 和 `removesuffix` 只在完整匹配时删除一次，比误用 strip 安全。' },
+  ],
+  conditions: [
+    { heading: '`if`：第一个判断入口', body: '`if condition:` 在条件真时执行其缩进块。condition 可是比较结果，也可利用容器真值；关键业务规则最好写成有名字的布尔变量，让条件可以单独检查。' },
+    { heading: '`elif`：只在前面未命中时判断', body: 'elif 属于同一条分支链，只有前面的 if/elif 都为假才会计算它。顺序很重要：应把更具体的条件放前面，避免宽泛条件先把输入拦截。' },
+    { heading: '`else`：覆盖剩余情况', body: 'else 不写条件，表示之前所有情况之外的剩余集合。若“剩余情况”中还含非法输入，应先验证范围，不要让 else 悄悄把错误数据归成正常类别。' },
+    { heading: '条件表达式：`a if condition else b`', body: '条件表达式根据条件产生一个值，例如 `label = "通过" if score >= 60 else "未通过"`。它适合简短赋值，不适合嵌套多个业务分支；复杂逻辑仍用普通 if。' },
+    { heading: '短路求值与副作用', body: 'and 左侧为假、or 左侧为真时，右侧不会执行，可用于先保护危险操作：`items and items[0]`。不要依赖隐藏副作用来写条件，清楚的显式语句更容易调试。' },
+  ],
+  'range-loop': [
+    { heading: '`range(stop)`', body: '`range(5)` 产生 0、1、2、3、4，stop 不包含。range 是可迭代的范围对象，不会提前创建完整整数列表；需要查看时可临时写 `list(range(5))`。' },
+    { heading: '`range(start, stop)`', body: '`range(2, 5)` 产生 2、3、4。start 包含、stop 不包含，这与切片规则一致；次数可用 `max(0, stop - start)` 在步长 1 时理解。' },
+    { heading: '`range(start, stop, step)`', body: '`range(10, 0, -2)` 产生 10、8、6、4、2。step 不能为 0；向下计数必须用负步长，并让 start 位于 stop 的另一侧。' },
+    { heading: '`for target in iterable`', body: 'for 每轮从可迭代对象取一项绑定给 target。target 可直接解包，如 `for key, value in pairs:`；不要在只需要元素时手写下标循环。' },
+    { heading: '`for ... else`', body: 'for 正常耗尽且未遇到 break 时执行 else，常用于“查找失败”。它不是“循环一次都没执行才运行”；只要没有 break，哪怕循环执行过也会进入 else。' },
+  ],
+  'while-control': [
+    { heading: '`while`：先判断再执行', body: 'while 在每轮开始前检查条件，第一次就为假时一次也不执行。写循环时明确初始状态、继续条件、状态更新三部分，缺少更新往往造成死循环。' },
+    { heading: '`break`：结束最近一层循环', body: 'break 立即离开最内层 for 或 while，不会自动退出外层循环。它适合已经找到答案或收到退出命令的场景；离开后从循环后的第一条语句继续。' },
+    { heading: '`continue`：跳过当前轮', body: 'continue 放弃当前轮剩余语句并进入下一轮。while 中使用时尤其要保证状态已经更新，否则会反复跳回同一条件造成死循环。' },
+    { heading: '`while ... else`', body: '循环条件自然变假且没有 break 时执行 else；被 break 终止则跳过 else。它可表达“重试次数用完仍未成功”，但团队不熟悉时也可改写为显式标志变量。' },
+  ],
+  'list-methods': [
+    { heading: '`append`：末尾添加一个元素', body: '`items.append(value)` 原地修改列表，返回 None。传入列表时会把整个列表作为一个元素加入；如果要逐项加入另一序列，应使用 extend。' },
+    { heading: '`extend` 与 `+=`：加入多个元素', body: '`items.extend(values)` 逐项追加可迭代对象并返回 None。`items += values` 对列表通常也是原地扩展；与 `items = items + values` 创建新列表不同。' },
+    { heading: '`insert`：指定位置插入', body: '`items.insert(index, value)` 在 index 前插入并原地修改。频繁在长列表头部插入成本较高；需要两端高效操作时可考虑 collections.deque。' },
+    { heading: '`remove`、`pop`、`clear`', body: 'remove(value) 删除第一个相等元素，找不到抛 ValueError；pop(index=-1) 删除并返回指定元素，越界抛 IndexError；clear() 删除全部元素并保留同一个列表对象。' },
+    { heading: '`index` 与 `count`', body: 'index(value) 返回第一次出现的位置，找不到抛 ValueError；count(value) 返回出现次数。只检查存在性用 `value in items`，不要先 count 再比较 0。' },
+    { heading: '`sort` 与 `sorted`', body: '`items.sort()` 原地排序并返回 None；`sorted(items)` 接受任意可迭代对象并返回新列表。两者都支持 key 和 reverse，不能写 `items = items.sort()`。' },
+    { heading: '`reverse`、切片倒序与 `reversed`', body: 'reverse() 原地反转列表并返回 None；`items[::-1]` 创建新列表；`reversed(items)` 返回按逆序迭代的对象。按是否需要修改原列表和是否需要立即复制选择。' },
+    { heading: '`copy`、切片复制与浅复制', body: '`items.copy()` 和 `items[:]` 都创建浅复制：外层列表独立，内部可变对象仍共享。嵌套数据需要完全独立时才考虑 copy.deepcopy，并先理解其成本。' },
+  ],
+  'tuples-sets': [
+    { heading: '元组字面量与单元素逗号', body: '`point = (3, 5)` 创建元组，真正决定元组的是逗号。单元素必须写 `(42,)`；`(42)` 只是带括号的整数。省略括号的 `x, y = 3, 5` 两侧都在使用元组打包/解包。' },
+    { heading: '元组的 `count` 与 `index`', body: 'tuple.count(value) 返回出现次数，tuple.index(value) 返回首次位置且找不到会抛 ValueError。元组没有 append/remove，因为它创建后不能增删元素。' },
+    { heading: '`set()` 与集合字面量', body: '`{"a", "b"}` 创建集合，空集合必须写 `set()`，因为 `{}` 是字典。集合元素必须可哈希，因此可放数字、字符串、元组，不能直接放列表或字典。' },
+    { heading: '`add`、`update`、`remove`、`discard`、`pop`', body: 'add 加一个元素，update 加多个；remove 找不到会抛 KeyError，discard 找不到也不报错；pop 删除并返回任意元素，不能把它当作“删除最后一个”。这些方法都会原地修改集合。' },
+    { heading: '并集、交集、差集、对称差', body: '`a | b` 并集，`a & b` 交集，`a - b` 只保留 a 独有元素，`a ^ b` 保留只在一边出现的元素。对应方法 union、intersection、difference、symmetric_difference 可接受更广的可迭代参数。' },
+    { heading: '子集、超集与互斥', body: '`a <= b` 判断子集，`a < b` 判断真子集，反向是超集。`a.isdisjoint(b)` 判断是否没有共同元素，比计算交集后再测空更直接。' },
+  ],
+  'dict-basics': [
+    { heading: '读取：`mapping[key]` 与 `get`', body: '`mapping[key]` 缺键时抛 KeyError，适合该键必须存在的情况。`mapping.get(key, default)` 缺键时返回默认值且不修改字典；若 None 也是合法值，要用 `key in mapping` 区分。' },
+    { heading: '新增与覆盖：赋值、`setdefault`、`update`', body: '`mapping[key] = value` 新增或覆盖一个键。setdefault 仅在缺键时写入默认值并返回最终值；update 批量合并，重复键以后来的值覆盖。' },
+    { heading: '删除：`del`、`pop`、`popitem`、`clear`', body: '`del mapping[key]` 缺键抛 KeyError；pop 删除键并返回值，可给默认值避免报错；popitem 删除并返回最后插入的键值对；clear 原地清空。' },
+    { heading: '键的要求与插入顺序', body: '字典键必须可哈希，常用字符串、数字、元组；列表不能作键。现代 Python 保留插入顺序，但字典的主要职责仍是按键查找，不应把它当成按位置访问的列表。' },
+    { heading: '字典推导式', body: '`{name: len(name) for name in names}` 同时生成键和值，也可在末尾加 if 筛选。重复键出现时，后生成的值覆盖先前值；需要保留多个值时应让值本身成为列表或集合。' },
+  ],
+  'dict-loop': [
+    { heading: '直接遍历与 `keys`', body: '`for key in mapping` 默认遍历键，与 `for key in mapping.keys()` 等价。keys 返回动态视图，字典变化时视图也会反映变化；遍历时不要改变字典大小。' },
+    { heading: '`values`：只遍历值', body: '`for value in mapping.values()` 不提供对应键。不同键可能有相同值，所以 values 不能反向唯一定位键；需要两者时使用 items。' },
+    { heading: '`items`：同时解包键和值', body: '`for key, value in mapping.items()` 每轮得到一个二元组并直接解包。它通常比先遍历键再写 mapping[key] 更清楚，也避免重复查找。' },
+    { heading: '安全修改与快照', body: '遍历字典时新增或删除键会触发 RuntimeError。若确需删除，可遍历 `list(mapping)` 的键快照；只更新已有键对应的值通常允许，但仍应保持逻辑简单。' },
+  ],
+  comprehensions: [
+    { heading: '列表推导式', body: '`[expression for item in iterable if condition]` 先遍历、可选筛选，再计算并收集到新列表。不要为了短而嵌套太多层；读不顺时展开成普通循环。' },
+    { heading: '集合推导式', body: '`{expression for item in iterable}` 创建集合并自动去重。花括号里没有冒号时是集合推导式；结果没有可依赖的列表下标。' },
+    { heading: '字典推导式', body: '`{key_expr: value_expr for item in iterable}` 创建字典。冒号分隔键和值；若多个输入产生相同键，后一个值会覆盖前一个。' },
+    { heading: '生成器表达式', body: '`(expression for item in iterable)` 按需产生值，不会立即建立完整容器。它只能消费一次；需要长度、索引或多次遍历时，列表通常更合适。' },
+    { heading: '条件位置的区别', body: '`[x for x in values if x > 0]` 是筛选；`[x if x > 0 else 0 for x in values]` 是每项二选一。带 else 的条件表达式必须写在 for 前面。' },
+  ],
+  functions: [
+    { heading: '`def`：定义而不是调用', body: '`def name(parameters):` 创建函数对象并绑定名字，函数体要等调用时才执行。定义通常放在调用之前；名字使用动词短语，表达单一职责。' },
+    { heading: '形参与实参', body: '定义中的名字是形参，调用时传入的是实参。位置实参按顺序匹配，关键字实参按名字匹配；同一参数不能既按位置又按关键字传两次。' },
+    { heading: '位置参数与关键字参数', body: '`connect(host, port=5432)` 混合了位置与关键字形式。关键字参数提高可读性且不依赖顺序，但必须放在位置实参之后。' },
+    { heading: '`/` 与 `*` 限制调用方式', body: '`def f(a, /, b, *, c):` 中 a 只能按位置传，c 只能按关键字传，b 两者都可以。普通入门函数不必急着使用，但阅读标准库签名时必须认得。' },
+    { heading: '`*args` 与 `**kwargs`', body: '*args 把额外位置实参收集为元组，**kwargs 把额外关键字实参收集为字典。不要用它们掩盖本来应该明确的接口；使用时仍要验证允许的参数。' },
+  ],
+  'scope-defaults': [
+    { heading: '局部、闭包、全局与内置查找顺序', body: '读取名字按 LEGB 顺序：Local、Enclosing、Global、Built-in。函数中的赋值默认创建局部变量；不要用 list、str、sum 等名字遮蔽内置对象。' },
+    { heading: '`global`', body: '`global name` 声明函数内对模块级变量重新绑定。它会增加隐藏依赖，通常用返回值或对象状态更清楚；读取全局常量不需要 global。' },
+    { heading: '`nonlocal`', body: '`nonlocal name` 让嵌套函数重新绑定最近一层外部函数变量，不会跳到模块全局。它常用于闭包状态，但复杂状态更适合封装成类。' },
+    { heading: '默认参数只在定义时求值一次', body: '`def add(item, items=[]):` 会让多次调用共享同一个列表。可变默认值应写 None，再在函数体创建新容器；不可变默认值如数字、字符串通常安全。' },
+    { heading: '仅关键字参数', body: '星号后的参数只能按名字传，例如 `def save(data, *, overwrite=False)`。这能避免布尔值调用 `save(data, True)` 含义不明，也为以后扩展参数保留空间。' },
+  ],
+  files: [
+    { heading: '`open` 的 `r`、`w`、`a`、`x`', body: '`r` 只读且文件必须存在；`w` 覆盖写；`a` 追加到末尾；`x` 仅在文件不存在时创建，否则报 FileExistsError。加 `+` 表示同时读写，但文件位置管理会更复杂。' },
+    { heading: '文本模式、二进制模式与编码', body: '默认 `t` 文本模式读写 str，`b` 二进制模式读写 bytes。文本文件应明确 `encoding="utf-8"`；图片、压缩包等必须用 rb/wb，不能指定文本编码。' },
+    { heading: '`read`、`readline`、`readlines`', body: 'read(size) 读取全部或指定字符数；readline 每次一行并通常保留换行；readlines 一次返回所有行列表。大文件优先直接 `for line in file` 流式遍历。' },
+    { heading: '`write` 与 `writelines`', body: 'write 接收一个字符串并返回写入字符数，不会自动换行。writelines 接收字符串序列，也不会替你添加换行；应由每个片段自己包含 `\\n`。' },
+    { heading: '`tell`、`seek` 与文件位置', body: 'tell 返回当前位置，seek 移动位置。文本模式下不要随意把字符下标当 seek 偏移；处理二进制协议时位置语义更直接。多数顺序读写程序不需要手动移动。' },
+    { heading: '`with` 与关闭时机', body: 'with 块结束时一定关闭文件，即使中途异常。离开块后再读写会触发 ValueError；需要的数据应在块内读取，或把已解析结果保存到普通变量。' },
+  ],
+  'exceptions-detail': [
+    { heading: '`try`：只包住可能失败的最小范围', body: 'try 中语句一旦抛异常，后续语句会被跳过。范围太大会让你无法判断是哪一步失败，也可能把真正 bug 当作预期错误处理。' },
+    { heading: '`except ErrorType as error`', body: 'except 只捕获能恢复的具体异常，`as error` 保存异常对象供提示或日志使用。多个异常处理相同可写元组；不要使用裸 except 隐藏 KeyboardInterrupt 等退出信号。' },
+    { heading: '`else`：只在没有异常时执行', body: 'else 适合放依赖 try 成功结果、但自身错误不应被同一 except 捕获的代码。它让“可能失败的操作”保持最小范围。' },
+    { heading: '`finally`：无论结果都清理', body: 'finally 在成功、异常、return 甚至 break 时都会运行，适合释放必须回收的资源。已有上下文管理器时优先用 with，避免手写清理。' },
+    { heading: '`raise` 与重新抛出', body: '`raise ValueError("说明")` 主动报告违反约定；except 中单独写 raise 会保留原回溯重新抛出。转换异常可写 `raise DomainError(...) from error` 保留因果链。' },
+    { heading: '自定义异常', body: '业务异常通常继承 Exception，并以 Error 结尾，例如 `class InvalidScoreError(ValueError): ...`。只有调用者确实需要单独处理时才创建新类型。' },
+  ],
+  modules: [
+    { heading: '`import module`', body: '`import math` 把模块对象绑定到 math，使用 `math.sqrt` 能清楚显示来源。模块顶层代码首次导入时执行一次，之后通常从缓存复用。' },
+    { heading: '`from module import name`', body: '这种形式把指定名字直接带入当前作用域，调用更短但来源不明显。避免 `from module import *`，它会污染命名空间并让静态检查困难。' },
+    { heading: '`as` 别名', body: '`import numpy as np` 或 `from long_module import function as short_name` 创建本地别名。别名应遵循领域惯例或解决命名冲突，不要为了少打几个字随意缩写。' },
+    { heading: '绝对导入与相对导入', body: '绝对导入从包根写完整路径；包内部可用 `.helpers` 表示当前包、`..models` 表示上一级。相对导入依赖包上下文，直接运行子模块可能失败，应通过包入口运行。' },
+    { heading: '`__all__` 与公开接口', body: '__all__ 是模块导出名字列表，主要影响星号导入并可记录公开接口。它不会让私有名字真正不可访问；下划线前缀仍只是“内部使用”的约定。' },
+  ],
+  classes: [
+    { heading: '`class` 与实例化', body: '`class User:` 创建类对象，`User(...)` 调用类生成实例。类名通常用大驼峰，实例名用小写；类适合把相同结构的数据和相关行为放在一起。' },
+    { heading: '`self`', body: '实例方法的第一个参数按惯例叫 self，调用 `user.rename("Ada")` 时 Python 自动把 user 传给它。定义时不能省略 self，调用时也不要手动再传一次。' },
+    { heading: '`__init__`', body: '__init__ 在实例创建后初始化属性，不负责返回实例，因此不能返回其他值。应在这里建立对象一开始就必须满足的不变量。' },
+    { heading: '实例属性与类属性', body: '`self.name` 属于各实例；类体中的 `species = "human"` 是类属性并被实例共享。可变类属性会被所有实例共同修改，通常应在 __init__ 中创建。' },
+    { heading: '实例方法、`@classmethod`、`@staticmethod`', body: '实例方法接收 self；classmethod 接收 cls，常作替代构造器；staticmethod 不接收自动对象，只是放在类命名空间的普通函数。能用模块函数表达时不必强塞进类。' },
+    { heading: '属性访问与封装约定', body: '单下划线 `_name` 表示内部使用约定；双下划线会触发名称改写，不等同于安全私有。需要验证赋值或计算属性时使用 property，不要为每个字段机械写 getter/setter。' },
+  ],
+  'type-hints': [
+    { heading: '参数、返回值与变量注解', body: '`def greet(name: str) -> str` 标注参数和返回值，`count: int = 0` 标注变量。注解不会自动转换或验证运行时数据，外部输入仍需解析。' },
+    { heading: '容器泛型', body: '`list[str]` 表示字符串列表，`dict[str, int]` 表示字符串到整数的字典，`tuple[int, str]` 表示固定位置类型。`tuple[int, ...]` 表示任意长度的整数元组。' },
+    { heading: '联合类型与 `None`', body: '`str | None` 表示可能是字符串也可能没有值。使用前必须缩小类型，例如先写 `if value is None: return`；不要用 Any 逃避这种分支。' },
+    { heading: '`Literal` 与 `TypeAlias`', body: 'Literal 可限制为若干具体值，例如 `Literal["r", "w"]`。复杂类型可命名复用；现代 Python 可用 `type UserId = int`，兼容旧版本时使用 `TypeAlias`。' },
+    { heading: '`TypedDict`', body: 'TypedDict 为字典声明固定键及值类型，适合 JSON 风格数据。它运行时仍是普通 dict，不会自动验证；需要行为和不变量时考虑 dataclass。' },
+    { heading: '`Protocol`', body: 'Protocol 按“具有什么方法或属性”定义结构接口，不要求显式继承。它适合文件式对象、可调用对象和测试替身，保留鸭子类型同时获得静态检查。' },
+    { heading: '`Any`、`object` 与 `Never`', body: 'Any 关闭该值上的大部分检查；object 表示任意对象但使用前必须缩小；Never 表示函数不会正常返回。应选能表达真实约束的最精确类型。' },
+  ],
 }
 
 type LectureDetail = { prerequisites: string; reasoning: string; misconception: string; acceptance: string }
