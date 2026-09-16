@@ -60,6 +60,17 @@ describe('learning content contracts', () => {
     }
   })
 
+  it('explains Python operators one by one instead of only listing categories', () => {
+    const operators = pythonModule.lessons.find((lesson) => lesson.id === 'operators')
+    const lessonText = operators?.sections.map((section) => `${section.heading}\n${section.body}`).join('\n') ?? ''
+
+    expect(operators?.sections.length).toBeGreaterThanOrEqual(20)
+    expect(operators?.exercises.length).toBeGreaterThanOrEqual(5)
+    for (const operator of ['+', '-', '*', '/', '//', '%', '**', '@', '==', '!=', '>=', '<=', 'and', 'or', 'not', 'in', 'is', '&', '|', '^', '~', '<<', '>>', '+=', ':=']) {
+      expect(lessonText, operator).toContain(`\`${operator}\``)
+    }
+  })
+
   it('keeps the binary and hexadecimal source explanations intact in the app', () => {
     for (const module of [binaryModule, hexadecimalModule]) {
       expect(module.lessons.every((lesson) => (lesson.content?.length ?? 0) > 500), module.id).toBe(true)
