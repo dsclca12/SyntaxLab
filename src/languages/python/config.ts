@@ -2,18 +2,6 @@ import type { Exercise, LearningModule, ResourceLink } from '../../core/types'
 
 type Rule = (source: string) => boolean
 
-// 将短课按学习目标分组：读者先知道当前在解决哪一类问题，再进入一个具体语法点。
-const pythonLessonChapters: Record<string, string> = {
-  start: '第 1 章 · 开始运行 Python', environment: '第 1 章 · 开始运行 Python',
-  values: '第 2 章 · 值、变量与文本', strings: '第 2 章 · 值、变量与文本', operators: '第 2 章 · 值、变量与文本', 'number-format': '第 2 章 · 值、变量与文本', 'string-tools': '第 2 章 · 值、变量与文本',
-  conditions: '第 3 章 · 条件与控制流', 'boolean-branches': '第 3 章 · 条件与控制流', 'match-case': '第 3 章 · 条件与控制流',
-  loops: '第 4 章 · 循环与遍历', 'range-loop': '第 4 章 · 循环与遍历', 'while-control': '第 4 章 · 循环与遍历', 'iteration-tools': '第 4 章 · 循环与遍历',
-  collections: '第 5 章 · 容器与数据组织', 'list-methods': '第 5 章 · 容器与数据组织', 'tuples-sets': '第 5 章 · 容器与数据组织', 'dict-basics': '第 5 章 · 容器与数据组织', 'dict-loop': '第 5 章 · 容器与数据组织', comprehensions: '第 5 章 · 容器与数据组织',
-  functions: '第 6 章 · 函数与程序结构', 'function-returns': '第 6 章 · 函数与程序结构', 'scope-defaults': '第 6 章 · 函数与程序结构',
-  files: '第 7 章 · 文件、异常与模块', 'exceptions-detail': '第 7 章 · 文件、异常与模块', modules: '第 7 章 · 文件、异常与模块', 'json-paths': '第 7 章 · 文件、异常与模块',
-  classes: '第 8 章 · 面向对象与实践', 'testing-debugging': '第 8 章 · 面向对象与实践', algorithm: '第 8 章 · 面向对象与实践', 'mini-project': '第 8 章 · 面向对象与实践',
-}
-
 const compact = (source: string) => source.trim().replace(/\r/g, '').split('\n').map((line) => line.trimEnd()).join('\n')
 const has = (...patterns: RegExp[]): Rule => (source) => patterns.every((pattern) => pattern.test(source))
 const exactOr = (solution: string, alternatives: string[] = []): Rule => (source) => [solution, ...alternatives].some((answer) => compact(source) === compact(answer))
@@ -58,7 +46,7 @@ const lesson = (
     { heading: '常见误区', body: lecture.misconception },
     { heading: '无 AI 验收标准', body: lecture.acceptance },
   ] : []
-  return { id, number, title, eyebrow: 'PYTHON 入门路径', summary, chapter: pythonLessonChapters[id], sections: [...sections, ...(zeroBaseGuides[id] ?? []), ...lectureSections], example, goals, exercises, note, walkthrough: detail.walkthrough, checkpoints: detail.checkpoints, resources: detail.resources }
+  return { id, number, title, eyebrow: 'PYTHON 系统教程', summary, chapter: `第 ${Number(number)} 章 · ${title}`, sections: [...sections, ...(zeroBaseGuides[id] ?? []), ...lectureSections], example, goals, exercises, note, walkthrough: detail.walkthrough, checkpoints: detail.checkpoints, resources: detail.resources }
 }
 
 // 每个示例都配一份“读代码路线”。初学者最容易卡住的不是记不住关键字，
@@ -203,11 +191,11 @@ const lectureDetails: Record<string, LectureDetail> = {
 
 export const pythonModule: LearningModule = {
   id: 'python-level-2',
-  name: 'Python 入门进阶',
-  language: 'Python 入门',
+  name: 'Python 系统教程',
+  language: 'Python',
   editor: 'python',
   available: true,
-  description: '从第一行可运行代码，到能独立拆解一类小程序题。',
+  description: '45 个独立章节，从第一行可运行代码，到面向对象、类型注解与异步编程。',
   lessons: [
     lesson('start', '01', '让程序跑起来', '先建立“保存、运行、观察输出”的完整闭环。', [
       { heading: '推荐版本与下载来源', body: '优先使用 Python 3 的稳定版本。本课程编写时推荐 Python 3.14.7；如果你的学校、考试或项目明确要求 3.12/3.13，就以要求为准，不要为了追新版本破坏兼容性。请从上方“Python 官网下载”进入 python.org，不要从来路不明的“绿色版”或第三方打包站下载。' },
@@ -546,5 +534,131 @@ python -m pip --version
       ex('mini-project-1', '添加待办任务', '将 title 添加到 tasks 列表末尾。', '', 'tasks.append(title)', ['任务列表是 tasks。', '添加方法是 append。', '传入 title。'], has(/tasks\.append\s*\(\s*title\s*\)/)),
       ex('mini-project-2', '按序号展示任务', '从 1 开始遍历 tasks，打印编号和任务文本。', '', 'for number, task in enumerate(tasks, start=1):\n    print(f"{number}. {task}")', ['使用 enumerate。', 'start=1 用于展示编号。', 'f-string 显示编号和任务。'], has(/enumerate\s*\(\s*tasks\s*,\s*start\s*=\s*1\s*\)/, /print\s*\(\s*f["'][\s\S]*\{\s*number\s*\}/)),
     ], '完成这课后，尝试自己实现一个命令：delete 2。先写清楚输入是什么、下标怎样转换、无效序号如何提示，再写代码。'),
+    lesson('indentation-comments', '32', '缩进、注释与 pass', '读懂 Python 如何用缩进表示代码块，并正确使用注释和占位语句。', [
+      { heading: '缩进是语法，不是排版', body: '`if`、`for`、`while`、`def`、`class`、`try` 等以冒号结尾的语句会开始代码块。同一个块内必须保持相同缩进，通常使用 4 个空格。混用 Tab 和空格可能触发 `TabError`，缩进层级错会导致逻辑改变。' },
+      { heading: '注释解释“为什么”', body: '`#` 后到行末是注释。好注释说明业务规则、单位、数据来源或特殊边界；不需要把 `count += 1` 重复成“计数加一”。注释应随代码一起更新，错误注释比没有注释更危险。' },
+      { heading: '文档字符串不是普通注释', body: '函数、类或模块开头的三引号字符串会成为 `__doc__`，用于说明公开用法。它是运行时可读的字符串，不是用来批量“注释掉”代码的工具。' },
+      { heading: 'pass 只占位，什么也不做', body: '语法要求某个代码块不能为空，但逻辑尚未实现时可以暂用 `pass`。它不会跳过循环；跳过当前轮应用 `continue`，离开循环应用 `break`。' },
+    ], 'def normalize_name(name):\n    """去掉姓名两端空白并统一大小写。"""\n    # 外部数据可能带有多余空格\n    return name.strip().title()', ['能用缩进识别代码块边界', '能区分行注释与文档字符串', '知道 pass、continue、break 的不同职责'], [
+      ex('indentation-comments-1', '补全空函数', '在尚未实现的 build_report 函数中写入合法占位语句。', 'def build_report():\n    ', 'def build_report():\n    pass', ['空代码块需要一条语句。', '占位关键字是 pass。', 'pass 要缩进在函数内。'], has(/def\s+build_report\s*\(\s*\)\s*:\s*\n\s+pass/)),
+      ex('indentation-comments-2', '写函数文档', '为 add(a, b) 加一行文档字符串“返回两数之和。”。', 'def add(a, b):\n    return a + b', 'def add(a, b):\n    """返回两数之和。"""\n    return a + b', ['文档字符串放在函数体第一行。', '使用三引号。', '保持 4 空格缩进。']),
+    ], '缩进问题时，先打开编辑器的“显示空白字符”，再检查每个冒号后的块。'),
+    lesson('none-identity', '33', 'None、真值与身份比较', '掌握“没有值”的表示方式，避免把空值、0 和 False 混为一谈。', [
+      { heading: 'None 表示缺少结果', body: '`None` 是唯一的空值对象，常用于“尚未设置”或“没有找到”。函数没写 `return`，或只写 `return`，都会返回 None。调用者需要明确处理这个可能性。' },
+      { heading: '用 is None，不用 == None', body: '`==` 比较值，`is` 比较是否为同一个对象。None 是单例，规范写法是 `value is None` 与 `value is not None`。不要用 is 比较字符串和数字，那会依赖实现细节。' },
+      { heading: '真值判断是一组约定', body: '`None`、`False`、0、0.0、空字符串和空容器都在条件中视为假，其他大多数对象视为真。`if not items` 适合判断容器为空；若 0 是合法数据，则不能用 `if not result` 代替 `result is None`。' },
+      { heading: '哨兵值让“未提供”与 None 分开', body: '有时 None 本身也是合法参数。此时可创建 `MISSING = object()`，默认参数使用 MISSING，再以 `is MISSING` 判断调用者是否真的没传值。' },
+    ], 'def find_even(numbers):\n    for number in numbers:\n        if number % 2 == 0:\n            return number\n    return None\n\nresult = find_even([1, 3, 5])\nif result is None:\n    print("没有偶数")', ['能说明 None 与 0 的区别', '能正确使用 is None', '能根据业务含义选择真值判断'], [
+      ex('none-identity-1', '检查缺少结果', '当 result 没有值时输出“未找到”。', '', 'if result is None:\n    print("未找到")', ['检查 None 使用 is。', '条件后加冒号。', '输出语句缩进。'], has(/if\s+result\s+is\s+None\s*:/)),
+      ex('none-identity-2', '区分 0 和 None', '只在 count 为 None 时设为 0，保留已有的 0。', '', 'if count is None:\n    count = 0', ['不要写 if not count。', '0 不代表未设置。', '使用 is None。'], has(/if\s+count\s+is\s+None\s*:/, /count\s*=\s*0/)),
+    ]),
+    lesson('unpacking', '34', '解包、星号表达式与参数收集', '把序列按结构分配给变量，并用 * 与 ** 处理不定数量的数据。', [
+      { heading: '基本解包要求数量匹配', body: '`name, score = ("Ada", 95)` 会一次绑定两个变量。右侧可以是任何可迭代对象；元素数量过多或过少都会触发 ValueError。交换变量可直接写 `left, right = right, left`。' },
+      { heading: '星号变量收集剩余元素', body: '`first, *middle, last = values` 会把中间所有元素收集成列表。一次解包最多只能有一个星号目标，否则 Python 无法确定如何分配。' },
+      { heading: '*args 收集位置参数', body: '在函数定义中，`*args` 把多余位置参数收集为元组；`**kwargs` 把多余关键字参数收集为字典。args/kwargs 只是惯用名，真正语法是星号。不要为了“灵活”而隐藏本应明确的参数。' },
+      { heading: '调用时的 * 和 ** 是展开', body: '`function(*values)` 把序列元素作为位置参数，`function(**options)` 把字典键值作为关键字参数。字典的键必须是字符串且与参数名匹配。' },
+    ], 'def summarize(title, *scores, precision=1):\n    average = sum(scores) / len(scores)\n    return f"{title}：{average:.{precision}f}"\n\noptions = {"precision": 2}\nprint(summarize("数学", 80, 90, 95, **options))', ['能完成定长与带星号解包', '能区分定义时的收集与调用时的展开', '知道 args 是元组、kwargs 是字典'], [
+      ex('unpacking-1', '收集中间元素', '将 values 的首项绑定到 first，末项绑定到 last，中间项收集到 middle。', '', 'first, *middle, last = values', ['中间变量前加 *。', '三个目标用逗号分隔。', '右边是 values。'], has(/first\s*,\s*\*middle\s*,\s*last\s*=\s*values/)),
+      ex('unpacking-2', '展开配置字典', '调用 connect，将 config 的键值展开为关键字参数。', '', 'connect(**config)', ['关键字展开使用两个星号。', '星号写在 config 前。', '这是函数调用。'], has(/connect\s*\(\s*\*\*config\s*\)/)),
+    ]),
+    lesson('sorting-callables', '35', '排序、key 函数与 lambda', '通过“先提取比较键”排序复杂数据，并掌握 lambda 的合理使用边界。', [
+      { heading: 'sorted 返回新列表', body: '`sorted(iterable)` 可以处理任何可迭代对象并返回新列表；`list.sort()` 只用于列表并原地修改，返回 None。需要保留原顺序时用 sorted，明确要改变原列表时用 sort。' },
+      { heading: 'key 描述“按什么比”', body: '`key` 接收一个函数，排序前对每个元素调用一次。排学生字典可写 `key=lambda student: student["score"]`；忽略大小写排文本可写 `key=str.casefold`。' },
+      { heading: 'lambda 只适合短表达式', body: '`lambda x: x * 2` 创建一个匿名函数，只能包含一个表达式。当逻辑需要解释、测试或复用时，应改用 `def`。lambda 最常见的合理场景是 key 参数。' },
+      { heading: '多字段排序返回元组键', body: '需要“班级升序，同班分数降序”时，可用 `key=lambda s: (s["class"], -s["score"])`。Python 依次比较元组中的字段，这比分多次手工排序更清楚。' },
+    ], 'students = [\n    {"name": "Lin", "score": 88},\n    {"name": "Ada", "score": 95},\n]\nranked = sorted(students, key=lambda item: item["score"], reverse=True)\nprint(ranked)', ['能区分 sorted 与 list.sort', '能用 key 排序字典或对象', '能判断 lambda 是否过于复杂'], [
+      ex('sorting-callables-1', '按长度排序', '将 words 按字符串长度排序，保存到 ordered。', '', 'ordered = sorted(words, key=len)', ['使用 sorted。', 'key 可直接传 len。', '不要写 len()。'], has(/ordered\s*=\s*sorted\s*\(\s*words\s*,\s*key\s*=\s*len\s*\)/)),
+      ex('sorting-callables-2', '按分数降序', '将 students 按 score 从高到低排序。', '', 'ranked = sorted(students, key=lambda student: student["score"], reverse=True)', ['key 返回 score。', '降序设置 reverse=True。', '结果保存到 ranked。'], has(/sorted\s*\([\s\S]*key\s*=\s*lambda[\s\S]*["']score["'][\s\S]*reverse\s*=\s*True/)),
+    ]),
+    lesson('iterators-generators', '36', '迭代器、生成器与 yield', '理解 for 循环背后的迭代协议，并按需产生数据而不一次性占满内存。', [
+      { heading: '可迭代对象与迭代器不同', body: '列表、字符串、字典等可以交给 `iter()` 得到迭代器。`next(iterator)` 每次取一项，耗尽后抛出 `StopIteration`。for 循环会自动执行这套流程。' },
+      { heading: '生成器函数用 yield 暂停', body: '只要函数体包含 `yield`，调用它就返回生成器，而不是立即执行完全部代码。每次 next 运行到 yield，产生一个值并保留局部状态，下次从原位置继续。' },
+      { heading: '生成器只能消费一次', body: '对同一个生成器迭代完后，再次循环不会重新产生值。需要重复使用时，重新调用生成器函数，或在数据量可控时显式转成列表。' },
+      { heading: '生成器表达式适合数据流', body: '`(line.strip() for line in file)` 使用圆括号，每次只处理一行。它适合大文件和流式管道；若后续需要下标、长度或多次遍历，列表更直观。' },
+    ], 'def countdown(start):\n    current = start\n    while current > 0:\n        yield current\n        current -= 1\n\nfor number in countdown(3):\n    print(number)', ['能解释 iter、next 与 StopIteration', '能用 yield 写一个有限生成器', '能在列表与生成器之间做选择'], [
+      ex('iterators-generators-1', '生成偶数', '定义 even_numbers(limit)，依次 yield 从 0 开始、小于 limit 的偶数。', '', 'def even_numbers(limit):\n    for number in range(0, limit, 2):\n        yield number', ['range 步长为 2。', '每轮使用 yield。', '停止值 limit 不包含。'], has(/def\s+even_numbers\s*\(\s*limit\s*\)\s*:/, /yield\s+number/)),
+      ex('iterators-generators-2', '写生成器表达式', '创建 squares，按需产生 numbers 中每个数的平方。', '', 'squares = (number ** 2 for number in numbers)', ['生成器表达式用圆括号。', '平方使用 ** 2。', '遍历 numbers。'], has(/squares\s*=\s*\(\s*number\s*\*\*\s*2\s+for\s+number\s+in\s+numbers\s*\)/)),
+    ]),
+    lesson('packages-main', '37', '模块、包与 __main__ 入口', '把多个 Python 文件组织成可复用的程序，并分离“被导入”与“直接运行”。', [
+      { heading: '一个 .py 文件就是模块', body: '`import calculator` 会查找 calculator.py，执行其顶层代码一次，并把模块对象绑定到名字 calculator。因此顶层应主要放定义和常量，避免导入时立即读输入、写文件或发网络请求。' },
+      { heading: '包用目录表达命名空间', body: '包将相关模块放进同一目录。`from app.services import users` 比含糊的短名更能表达所属领域。现代 Python 支持无 __init__.py 的命名空包，但学习项目通常保留 __init__.py 以明确边界。' },
+      { heading: '__name__ 区分两种使用方式', body: '文件被直接运行时，`__name__ == "__main__"`；被导入时，__name__ 是模块名。把启动逻辑放进 `main()` 并用这个条件保护，导入后就能安全测试其中函数。' },
+      { heading: '避免循环导入', body: 'a.py 导入 b.py，b.py 又导入 a.py 时，可能拿到尚未初始化完的模块。根本修复通常是抽出双方共享的数据类型或函数到第三个模块，而不是随意把 import 塞到函数里。' },
+    ], 'def main():\n    print("程序开始")\n\nif __name__ == "__main__":\n    main()', ['能解释导入时会发生什么', '能组织一个基本 Python 包', '能使用 __main__ 保护启动逻辑'], [
+      ex('packages-main-1', '保护程序入口', '只在当前文件直接运行时调用 main()。', '', 'if __name__ == "__main__":\n    main()', ['特殊变量是 __name__。', '直接运行时值是 __main__。', '函数调用要缩进。'], has(/if\s+__name__\s*==\s*["']__main__["']\s*:/, /main\s*\(\s*\)/)),
+      ex('packages-main-2', '从子模块导入', '从 app.services.users 导入 find_user。', '', 'from app.services.users import find_user', ['使用 from ... import ...。', '模块路径用点分隔。', '导入名是 find_user。'], has(/from\s+app\.services\.users\s+import\s+find_user/)),
+    ]),
+    lesson('decorators', '38', '装饰器与函数包装', '在不修改函数主体的情况下增加日志、计时或权限检查。', [
+      { heading: '函数也是值', body: '函数可以绑定到新变量、作为参数传入、从其他函数返回。装饰器的本质是：接收一个函数，返回一个新函数。`@trace` 只是 `work = trace(work)` 的紧凑写法。' },
+      { heading: 'wrapper 负责前后加逻辑', body: '通用包装器通常定义 `wrapper(*args, **kwargs)`，在内部调用原函数，并且必须返回原函数的结果。忘记 return 会让装饰后的函数意外返回 None。' },
+      { heading: 'functools.wraps 保留元数据', body: '不使用 `@wraps(function)` 时，装饰后的 `__name__`、`__doc__` 和调试信息都会变成 wrapper。wraps 会复制关键元数据，是自定义装饰器的标准做法。' },
+      { heading: '带参数装饰器多一层函数', body: '`@retry(3)` 会先调用 retry(3) 获得真正的装饰器，再用它包装目标函数。因此结构是“配置层 → 装饰器层 → wrapper 层”，应先会无参数装饰器再学。' },
+    ], 'from functools import wraps\n\ndef trace(function):\n    @wraps(function)\n    def wrapper(*args, **kwargs):\n        print(f"调用：{function.__name__}")\n        return function(*args, **kwargs)\n    return wrapper\n\n@trace\ndef add(a, b):\n    return a + b', ['能把 @decorator 还原成普通函数调用', '能正确透传参数和返回值', '能使用 functools.wraps'], [
+      ex('decorators-1', '补全包装器返回值', '在 wrapper 中调用 function 并返回它的结果，透传所有参数。', 'def wrapper(*args, **kwargs):\n    ', 'def wrapper(*args, **kwargs):\n    return function(*args, **kwargs)', ['使用 return。', '位置参数用 *args 展开。', '关键字参数用 **kwargs 展开。'], has(/return\s+function\s*\(\s*\*args\s*,\s*\*\*kwargs\s*\)/)),
+      ex('decorators-2', '保留函数信息', '在 wrapper 定义前使用 wraps(function)。', '', '@wraps(function)\ndef wrapper(*args, **kwargs):\n    return function(*args, **kwargs)', ['装饰器以 @ 开头。', '调用 wraps(function)。', '紧贴 wrapper 定义。'], has(/@wraps\s*\(\s*function\s*\)\s*\ndef\s+wrapper/)),
+    ]),
+    lesson('context-managers', '39', '上下文管理器与 with', '对文件、锁、连接等资源建立“进入—使用—退出”的可靠边界。', [
+      { heading: 'with 保证退出逻辑被执行', body: '`with open(...) as file:` 进入时获得文件对象，代码块结束时关闭文件。即使块内抛出异常，退出逻辑也会运行，因此它比手动 close 更可靠。' },
+      { heading: '协议由 __enter__ 和 __exit__ 组成', body: '对象进入 with 时调用 `__enter__`，`as` 后的变量接收其返回值；离开时调用 `__exit__`。__exit__ 返回 True 会压制异常，通常不应这样做，除非管理器明确知道如何恢复。' },
+      { heading: 'contextmanager 用生成器简化实现', body: '`@contextmanager` 装饰的生成器在 yield 之前做进入准备，yield 产出 as 的值，finally 中做退出清理。这适合轻量管理器，复杂状态则用类更清晰。' },
+      { heading: '多个资源可在一个 with 中管理', body: '复制文件可以写 `with open(source) as src, open(target, "w") as dst:`。资源按从左到右顺序进入，按反向顺序退出，类似稳固地叠放清理操作。' },
+    ], 'from contextlib import contextmanager\n\n@contextmanager\ndef timer(label):\n    import time\n    start = time.perf_counter()\n    try:\n        yield\n    finally:\n        elapsed = time.perf_counter() - start\n        print(f"{label}: {elapsed:.3f}s")\n\nwith timer("任务"):\n    sum(range(100_000))', ['能说明 with 为什么比手动清理安全', '能读懂上下文管理协议', '能用 contextmanager 实现简单资源边界'], [
+      ex('context-managers-1', '安全读取文件', '用 with 打开 data.txt，指定 UTF-8，将内容读到 content。', '', 'with open("data.txt", encoding="utf-8") as file:\n    content = file.read()', ['使用 with open。', 'as 后绑定 file。', 'read 调用缩进在块内。'], has(/with\s+open\s*\([\s\S]*encoding\s*=\s*["']utf-8["'][\s\S]*\)\s+as\s+file\s*:/, /content\s*=\s*file\.read\s*\(\s*\)/)),
+      ex('context-managers-2', '确保执行清理', '在生成器上下文管理器中，无论是否出错都调用 cleanup()。', '', 'try:\n    yield\nfinally:\n    cleanup()', ['使用 try/finally。', 'yield 在 try 中。', 'cleanup 放在 finally。'], has(/try\s*:\s*\n\s+yield[\s\S]*finally\s*:\s*\n\s+cleanup\s*\(\s*\)/)),
+    ]),
+    lesson('oop-inheritance', '40', '继承、组合与特殊方法', '让对象通过稳定协议协作，而不是把所有关系都硬塞进继承层次。', [
+      { heading: '继承表示“是一种”', body: '`class Admin(User)` 表示 Admin 可在需要 User 的地方使用。子类可重写方法，并通过 `super()` 复用父类实现。如果子类频繁破坏父类约定，这个继承关系可能是错的。' },
+      { heading: '组合表示“拥有一个”', body: '订单拥有支付器、汽车拥有引擎，更适合把一个对象作为另一个对象的属性。组合的耦合更低，运行时也能替换组件，通常优先于为复用几行代码而继承。' },
+      { heading: '特殊方法让对象融入 Python', body: '`__repr__` 返回面向开发者的表示，`__len__` 使对象支持 len，`__iter__` 使它可遍历，`__eq__` 定义值相等。应实现已有协议，不要自创令人意外的含义。' },
+      { heading: '多态关心能力，不关心具体类名', body: '只要对象提供需要的方法，Python 代码往往不必先用 isinstance 检查。例如 `save(writer)` 可接受任何实现 write 的对象，这种“鸭子类型”让测试替身也更容易。' },
+    ], 'class User:\n    def __init__(self, name):\n        self.name = name\n\n    def describe(self):\n        return self.name\n\nclass Admin(User):\n    def describe(self):\n        return f"{super().describe()} (管理员)"', ['能在继承与组合之间做选择', '能用 super 复用父类行为', '能为对象实现合适的 Python 协议'], [
+      ex('oop-inheritance-1', '调用父类初始化', '在 Admin.__init__ 中把 name 交给父类初始化。', 'class Admin(User):\n    def __init__(self, name):\n        ', 'class Admin(User):\n    def __init__(self, name):\n        super().__init__(name)', ['获得父类代理使用 super()。', '调用 __init__。', '传入 name，不要再传 self。'], has(/super\s*\(\s*\)\.__init__\s*\(\s*name\s*\)/)),
+      ex('oop-inheritance-2', '实现对象长度', '让 Team 的 len(team) 返回 members 的人数。', '', 'def __len__(self):\n    return len(self.members)', ['特殊方法是 __len__。', '接收 self。', '返回 self.members 的长度。'], has(/def\s+__len__\s*\(\s*self\s*\)\s*:/, /return\s+len\s*\(\s*self\.members\s*\)/)),
+    ]),
+    lesson('dataclasses-properties', '41', 'dataclass、属性与对象不变量', '用更少的样板代码表达数据对象，并在状态边界维护合法性。', [
+      { heading: 'dataclass 为数据类生成基础方法', body: '`@dataclass` 会根据带注解的字段生成 `__init__`、`__repr__` 和 `__eq__`。它适合“主要职责是携带数据”的类，但不意味着类不能拥有方法或验证逻辑。' },
+      { heading: '可变默认值必须用 default_factory', body: '列表、字典、集合不能直接写成 dataclass 字段默认值，否则多个实例可能共享状态。应写 `field(default_factory=list)`，为每个实例新建列表。' },
+      { heading: 'property 把计算结果暴露为属性', body: '`@property` 让 `rectangle.area` 在内部调用方法，但对调用者保持属性语法。它适合无参数、快速、无副作用的查询；昂贵计算或可能失败的操作更应使用显式方法。' },
+      { heading: '__post_init__ 维护构造后不变量', body: '生成的 __init__ 完成后会调用 `__post_init__`。可以在这里验证价格非负、结束时间不早于开始时间，非法时抛出 ValueError，确保对象一旦创建就处于合法状态。' },
+    ], 'from dataclasses import dataclass, field\n\n@dataclass\nclass Course:\n    title: str\n    students: list[str] = field(default_factory=list)\n\n    @property\n    def size(self):\n        return len(self.students)', ['能定义带类型注解的 dataclass', '能正确处理可变默认值', '能使用 property 表达计算属性'], [
+      ex('dataclasses-properties-1', '为列表字段建立工厂', '定义 tags 字段，每个实例都获得自己的空列表。', '', 'tags: list[str] = field(default_factory=list)', ['标注类型为 list[str]。', '调用 field。', 'default_factory 传 list，不加括号。'], has(/tags\s*:\s*list\s*\[\s*str\s*\]\s*=\s*field\s*\(\s*default_factory\s*=\s*list\s*\)/)),
+      ex('dataclasses-properties-2', '定义面积属性', '为 Rectangle 定义 area 只读属性，返回 width * height。', '', '@property\ndef area(self):\n    return self.width * self.height', ['使用 @property。', '方法只接收 self。', '返回两个属性的乘积。'], has(/@property\s*\ndef\s+area\s*\(\s*self\s*\)\s*:/, /return\s+self\.width\s*\*\s*self\.height/)),
+    ]),
+    lesson('type-hints', '42', '类型注解、联合类型与协议', '用类型注解记录函数契约，让编辑器和检查工具更早发现数据流错误。', [
+      { heading: '注解默认不做运行时校验', body: '`def greet(name: str) -> str` 是给人和工具的契约。Python 仍然允许调用者传入其他类型，所以外部输入仍需要显式解析与校验。类型检查通常在编辑器或 CI 中完成。' },
+      { heading: '现代容器和联合写法', body: 'Python 3.9+ 可写 `list[str]`、`dict[str, int]`；Python 3.10+ 可写 `str | None`。联合类型表示多种可能，不应用 `Any` 把不确定性隐藏起来。' },
+      { heading: 'TypeAlias 和 TypedDict 表达结构', body: '复杂类型可命名后复用。`TypedDict` 适合表达已有字典数据的固定键；如果数据同时需要行为、验证和实例方法，dataclass 通常更合适。' },
+      { heading: 'Protocol 按能力定义接口', body: '协议可以表示“任何具有 write(str) 方法的对象”，而不要求继承某个具体父类。这保留了 Python 的鸭子类型风格，同时让静态检查器能验证能力是否完整。' },
+    ], 'def average(values: list[float]) -> float | None:\n    if not values:\n        return None\n    return sum(values) / len(values)', ['能为参数、返回值与容器写注解', '能表达可选值和固定字典结构', '理解注解与运行时校验的边界'], [
+      ex('type-hints-1', '标注查找函数', '为 find_name 标注：names 是字符串列表，返回字符串或 None。', 'def find_name(names):', 'def find_name(names: list[str]) -> str | None:', ['列表元素类型是 str。', '返回类型用 ->。', '可能缺少时使用 | None。'], has(/def\s+find_name\s*\(\s*names\s*:\s*list\s*\[\s*str\s*\]\s*\)\s*->\s*str\s*\|\s*None\s*:/)),
+      ex('type-hints-2', '标注计数字典', '声明 counts 是从字符串到整数的字典。', '', 'counts: dict[str, int] = {}', ['容器类型是 dict。', '键是 str，值是 int。', '初始值是空字典。'], has(/counts\s*:\s*dict\s*\[\s*str\s*,\s*int\s*\]\s*=\s*\{\s*\}/)),
+    ]),
+    lesson('regex', '43', '正则表达式与文本匹配', '对具有明确模式的文本执行搜索、提取和替换，同时避免过度复杂化。', [
+      { heading: '先区分 fullmatch、match 和 search', body: '`re.fullmatch` 要求整个字符串符合模式，适合格式验证；`re.match` 只从开头尝试；`re.search` 在任意位置查找第一个匹配。选错 API 会让模式本身变得不必要地复杂。' },
+      { heading: '原始字符串减少双重转义', body: '正则和 Python 字符串都使用反斜杠，所以模式通常写成 `r"\\d+"`。原始字符串并不意味着正则不再解释转义，它只是让 Python 字符串层少处理一次。' },
+      { heading: '分组提取结构化部分', body: '圆括号创建捕获组，`(?P<year>\\d{4})` 创建命名组。匹配后可用 `group("year")` 读取，比记住第几组更稳定。只需要分组不需要提取时用 `(?:...)`。' },
+      { heading: '不是所有文本问题都需要正则', body: '固定分隔符优先用 split，前后缀优先用 startswith/endswith，简单替换优先用 replace。正则适合“格式有变化但规则可描述”的场景，并应配合边界样例测试。' },
+    ], 'import re\n\npattern = re.compile(r"(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})")\nmatch = pattern.fullmatch("2026-09-16")\nif match:\n    print(match.group("year"))', ['能根据任务选择 fullmatch、search 或 findall', '能使用原始字符串和命名分组', '能识别不需要正则的简单文本操作'], [
+      ex('regex-1', '提取所有数字', '使用 re.findall 找出 text 中所有连续数字并保存到 numbers。', '', 'numbers = re.findall(r"\\d+", text)', ['使用 findall。', '连续数字模式是 \\d+。', '模式使用原始字符串。'], has(/numbers\s*=\s*re\.findall\s*\(\s*r["']\\d\+["']\s*,\s*text\s*\)/)),
+      ex('regex-2', '验证六位验证码', '用 fullmatch 检查 code 是否恰好由 6 位数字组成。', '', 'valid = re.fullmatch(r"\\d{6}", code) is not None', ['验证整个字符串用 fullmatch。', '\\d{6} 表示六位数字。', '将匹配结果转成布尔值。'], has(/re\.fullmatch\s*\(\s*r["']\\d\{6\}["']\s*,\s*code\s*\)\s+is\s+not\s+None/)),
+    ]),
+    lesson('datetime', '44', '日期、时间、时区与 timedelta', '用标准类型计算时间，避免把日期当作普通字符串或秒数硬算。', [
+      { heading: 'date、time、datetime 职责不同', body: '`date` 只表示日历日期，`time` 只表示一天内时间，`datetime` 组合两者。年龄、到期日通常用 date；具体事件时刻使用带时区 datetime。' },
+      { heading: 'timedelta 表示时间间隔', body: '加 7 天应写 `moment + timedelta(days=7)`，不要手动改 day 字段。timedelta 会正确跨过月末和年末，但“下个自然月”并不等于固定 30 天，需要单独业务规则。' },
+      { heading: '优先使用 ISO 8601 解析与输出', body: '`date.fromisoformat("2026-09-16")` 和 `value.isoformat()` 往返稳定。`strptime` 用于外部自定义格式，格式符必须与输入完全对应；展示给用户时再使用 strftime 本地化。' },
+      { heading: '跨地区时刻必须带时区', body: '无 tzinfo 的 datetime 是“天真时间”，无法唯一定位全球时刻。存储事件时间通常使用 UTC，展示时用 `zoneinfo.ZoneInfo` 转到用户时区，不要用固定加 8 小时模拟所有时区。' },
+    ], 'from datetime import datetime, timedelta, timezone\nfrom zoneinfo import ZoneInfo\n\ncreated = datetime.now(timezone.utc)\nexpires = created + timedelta(days=7)\nshanghai = expires.astimezone(ZoneInfo("Asia/Shanghai"))\nprint(shanghai.isoformat())', ['能根据语义选择 date 或 datetime', '能用 timedelta 完成时间计算', '能创建、转换带时区的 datetime'], [
+      ex('datetime-1', '计算七天后', '将 created 的 7 天后保存到 expires。', '', 'expires = created + timedelta(days=7)', ['使用 timedelta。', '参数名是 days。', '与 created 相加。'], has(/expires\s*=\s*created\s*\+\s*timedelta\s*\(\s*days\s*=\s*7\s*\)/)),
+      ex('datetime-2', '解析 ISO 日期', '将字符串“2026-09-16”解析成 date 并保存到 day。', '', 'day = date.fromisoformat("2026-09-16")', ['使用 date 类。', '方法是 fromisoformat。', '日期保持 YYYY-MM-DD。'], has(/day\s*=\s*date\.fromisoformat\s*\(\s*["']2026-09-16["']\s*\)/)),
+    ]),
+    lesson('async-await', '45', 'async、await 与异步并发', '在等待网络或磁盘时让同一线程继续推进其他任务。', [
+      { heading: '异步适合 I/O 等待', body: '网络请求、数据库查询、高并发连接大量时间在等待外部结果，异步可以在等待期间处理其他任务。纯 CPU 密集计算不会因 async 自动变快，反而会阻塞事件循环。' },
+      { heading: 'async def 调用后得到协程', body: '调用异步函数不会立即执行完整函数，而是得到 coroutine 对象。在另一个 async 函数中用 `await` 等待结果，程序入口可以用 `asyncio.run(main())`。' },
+      { heading: 'gather 并发等待多个独立任务', body: '连续写两个 await 仍然是依次等待。当任务互不依赖时，可用 `await asyncio.gather(task_a(), task_b())` 共同推进。需要限流时应使用 Semaphore，不要无上限创建任务。' },
+      { heading: '取消和超时也是正常控制流', body: '异步系统中用户离开、请求超时都会取消任务。清理逻辑应放在 finally 或 `async with` 上下文管理器中。不要吞掉 `CancelledError`，否则程序可能无法及时停止。' },
+    ], 'import asyncio\n\nasync def fetch(name, delay):\n    await asyncio.sleep(delay)\n    return f"{name} 完成"\n\nasync def main():\n    results = await asyncio.gather(\n        fetch("A", 1),\n        fetch("B", 1),\n    )\n    print(results)\n\nasyncio.run(main())', ['能判断任务是否适合异步', '能编写并运行基本协程', '能区分顺序 await 与 gather 并发'], [
+      ex('async-await-1', '等待异步结果', '在 async 函数中调用 fetch_data() 并将结果保存到 data。', '', 'data = await fetch_data()', ['异步调用前写 await。', '保存到 data。', '函数调用需要括号。'], has(/data\s*=\s*await\s+fetch_data\s*\(\s*\)/)),
+      ex('async-await-2', '并发两个任务', '并发运行 load_users() 和 load_orders()，将结果解包到 users、orders。', '', 'users, orders = await asyncio.gather(load_users(), load_orders())', ['使用 asyncio.gather。', '整个 gather 需要 await。', '左边用两个变量解包。'], has(/users\s*,\s*orders\s*=\s*await\s+asyncio\.gather\s*\(\s*load_users\s*\(\s*\)\s*,\s*load_orders\s*\(\s*\)\s*\)/)),
+    ], '异步程序先画清“哪些任务互相依赖”：依赖的顺序 await，独立的再考虑 gather。'),
   ].sort((first, second) => Number(first.chapter?.match(/\d+/)?.[0] ?? 99) - Number(second.chapter?.match(/\d+/)?.[0] ?? 99) || Number(first.number) - Number(second.number)),
 }

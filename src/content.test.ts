@@ -47,6 +47,19 @@ describe('learning content contracts', () => {
     }
   })
 
+  it('keeps every Python topic in its own detailed chapter', () => {
+    const chapters = pythonModule.lessons.map((lesson) => lesson.chapter)
+
+    expect(pythonModule.lessons.length).toBeGreaterThanOrEqual(45)
+    expect(new Set(chapters).size).toBe(pythonModule.lessons.length)
+    for (const lesson of pythonModule.lessons) {
+      expect(lesson.chapter, lesson.id).toContain(lesson.title)
+      expect(lesson.sections.length, lesson.id).toBeGreaterThanOrEqual(3)
+      expect(lesson.goals?.length, lesson.id).toBeGreaterThanOrEqual(3)
+      expect(lesson.exercises.length, lesson.id).toBeGreaterThanOrEqual(2)
+    }
+  })
+
   it('keeps the binary and hexadecimal source explanations intact in the app', () => {
     for (const module of [binaryModule, hexadecimalModule]) {
       expect(module.lessons.every((lesson) => (lesson.content?.length ?? 0) > 500), module.id).toBe(true)
